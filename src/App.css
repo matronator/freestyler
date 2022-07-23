@@ -1,5 +1,9 @@
 .App {
   text-align: center;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .App-logo {
@@ -26,6 +30,90 @@
 
 .App-link {
   color: #61dafb;
+}
+
+main {
+  width: 1024px;
+  min-height: 480px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-areas:
+  "l p"
+  "l t";
+  grid-template-rows: 2fr 1fr;
+  grid-template-columns: 1fr 3fr;
+}
+
+.property-list {
+  grid-area: l;
+  width: 320px;
+  background-color: #aaaaaa;
+}
+
+.property-list ul {
+  list-style: none;
+  padding-inline-start: 0;
+}
+
+.property-list ul > li {
+  position: relative;
+  margin-bottom: .5rem;
+  padding-bottom: .5rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  align-items: center;
+  border-bottom: .5px solid #222;
+}
+
+.property-list .list-label {
+  text-align: right;
+  padding-right: .25rem;
+  font-size: 0.75rem;
+  font-family: 'Dosis', sans-serif;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+.property-list ul > li > :nth-child(2) {
+  text-align: right;
+}
+.property-list ul > li > :last-child {
+  justify-self: flex-end;
+}
+
+.tools {
+  grid-area: t;
+  background-color: #c0c0c0;
+}
+
+.input-slider {
+  width: 100%;
+}
+
+.picker {
+  position: relative;
+}
+
+.picker-input {
+  display: flex;
+  justify-content: space-around;
+}
+
+.swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.popover {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  border-radius: 9px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  z-index: 999;
 }
 
 @keyframes App-logo-spin {
