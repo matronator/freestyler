@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 .App {
   text-align: center;
   min-height: 100vh;
@@ -61,6 +65,8 @@ main {
   padding-bottom: .5rem;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  row-gap: 4px;
+  column-gap: 3px;
   align-items: center;
   border-bottom: .5px solid #222;
 }
@@ -76,17 +82,13 @@ main {
 .property-list ul > li > :nth-child(2) {
   text-align: right;
 }
-.property-list ul > li > :last-child {
+/* .property-list ul > li > :last-child {
   justify-self: flex-end;
-}
+} */
 
 .tools {
   grid-area: t;
   background-color: #c0c0c0;
-}
-
-.input-slider {
-  width: 100%;
 }
 
 .picker {

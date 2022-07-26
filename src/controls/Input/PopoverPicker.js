@@ -1,7 +1,7 @@
-import React, { useCallback, useRef, useState } from "react";
-import { HexColorPicker, HexColorInput } from "react-colorful";
-
-import useClickOutside from "./../effects/useClickOutside";
+import { useCallback, useRef, useState, useMemo } from "react";
+import { HexColorInput, RgbaStringColorPicker } from "react-colorful";
+import useClickOutside from "./../../effects/useClickOutside";
+import { colord } from 'colord';
 
 export const PopoverPicker = ({ color, onChange }) => {
   const popover = useRef();
@@ -9,6 +9,10 @@ export const PopoverPicker = ({ color, onChange }) => {
 
   const close = useCallback(() => toggle(false), []);
   useClickOutside(popover, close);
+
+  const hexString = useMemo(() => {
+    return color.startsWith("#") ? color : colord(color).toHex();
+  }, [color]);
 
   return (
     <div className="picker w-100">
@@ -18,12 +22,12 @@ export const PopoverPicker = ({ color, onChange }) => {
             style={{ backgroundColor: color }}
             onClick={() => toggle(true)}
           />
-          <HexColorInput className='w-70' color={color} onChange={onChange} onClick={toggle} alpha prefix='#' />
+          <HexColorInput className='w-70' color={hexString} onChange={onChange} onClick={toggle} alpha prefixed />
       </div>
 
       {isOpen && (
         <div className="popover" ref={popover}>
-          <HexColorPicker color={color} onChange={onChange} />
+          <RgbaStringColorPicker color={color} onChange={onChange} />
         </div>
       )}
     </div>

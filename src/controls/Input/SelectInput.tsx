@@ -1,3 +1,4 @@
+import './SelectInput.css';
 import { ChangeEventHandler, Component, CSSProperties, ReactNode } from "react";
 
 interface SelectInputProps {
@@ -18,7 +19,7 @@ export class SelectInput extends Component<SelectInputProps, SelectInputState> {
 
     render(): ReactNode {
         return (
-            <select className={this.props.className} style={this.props.style} name={this.props.name} id={this.props.id} onChange={this.props.onChange}>
+            <select className={[this.props.className, 'select-input'].join(' ')} style={this.props.style} name={this.props.name} id={this.props.id} onChange={this.props.onChange}>
                 {this.props.items.map((item: string, key: number) =>
                     <option key={key} value={item}>{item}</option>
                 )}
