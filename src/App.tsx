@@ -63,7 +63,13 @@ class App extends Component<AppProps, AppState> {
     this.setState(prevState => ({
       preview: newItem.preview,
       previewItems: [
-        ...prevState.previewItems.map((item, index) => { item.selected = false; return item; }),
+        ...prevState.previewItems.map((item, index) => {
+          if (item.id === prevState.preview.id) {
+            item.preview = prevState.preview;
+          }
+          item.selected = false;
+          return item;
+        }),
         newItem,
       ],
       selectedId: newItem.id,
@@ -91,7 +97,13 @@ class App extends Component<AppProps, AppState> {
       selectedItem.selected = true;
       this.setState(prevState => ({
         preview: selectedItem.preview,
-        previewItems: prevState.previewItems.map((item, index) => { item.selected = false; return item; }),
+        previewItems: prevState.previewItems.map((item, index) => {
+          if (item.id === prevState.preview.id) {
+            item.preview = prevState.preview;
+          }
+          item.selected = false;
+          return item;
+        }),
         selectedId: selectedItem.id,
       }));
     }
@@ -103,8 +115,8 @@ class App extends Component<AppProps, AppState> {
         <main>
           <nav className="property-list">
             <ul>
-              <li><InputSlider name="Width" min={0} max={400} step={1} onSliderChange={this.sliderChange} /></li>
-              <li><InputSlider name="Height" min={0} max={300} step={1} onSliderChange={this.sliderChange} /></li>
+              <li><InputSlider name="Width" min={0} max={400} step={1} onSliderChange={this.sliderChange} value={this.state.preview.width} /></li>
+              <li><InputSlider name="Height" min={0} max={300} step={1} onSliderChange={this.sliderChange} value={this.state.preview.height} /></li>
               <li><div className='col-4 list-label'>Background:</div><div className='col-8 text-right w-100'><PopoverPicker color={this.state.preview.backgroundColor} onChange={(color: string) => this.setState({preview: {...this.state.preview, backgroundColor: color}, previewItems: this.state.previewItems, selectedId: this.state.selectedId})} /></div></li>
               <li><BorderControl
                   color={this.state.preview.border.color}
@@ -112,12 +124,12 @@ class App extends Component<AppProps, AppState> {
                   onSelectChange={this.selectChange}
                   sliderProps={{ min: 0, max: 100, step: 1, value: 0, property: 'width', name: 'Border', onSliderChange: this.sliderChange }} />
               </li>
-              <li><InputSlider name="Border" property="radius" title="Border radius" value={0} min={0} max={200} step={1} onSliderChange={this.sliderChange} /></li>
+              <li><InputSlider name="Border" property="radius" title="Border radius" value={this.state.preview.border.radius} min={0} max={200} step={1} onSliderChange={this.sliderChange} /></li>
               <li>
-                <InputSlider name="BoxShadow" property="x" title="Shadow X" value={0} min={-100} max={100} step={1} onSliderChange={this.sliderChange} />
-                <InputSlider name="BoxShadow" property="y" title="Shadow Y" value={0} min={-100} max={100} step={1} onSliderChange={this.sliderChange} />
-                <InputSlider name="BoxShadow" property="blur" title="Shadow Blur" value={0} min={0} max={100} step={1} onSliderChange={this.sliderChange} />
-                <InputSlider name="BoxShadow" property="spread" title="Shadow Spread" value={0} min={-100} max={100} step={1} onSliderChange={this.sliderChange} />
+                <InputSlider name="BoxShadow" property="x" title="Shadow X" value={this.state.preview.boxShadow.x} min={-100} max={100} step={1} onSliderChange={this.sliderChange} />
+                <InputSlider name="BoxShadow" property="y" title="Shadow Y" value={this.state.preview.boxShadow.y} min={-100} max={100} step={1} onSliderChange={this.sliderChange} />
+                <InputSlider name="BoxShadow" property="blur" title="Shadow Blur" value={this.state.preview.boxShadow.blur} min={0} max={100} step={1} onSliderChange={this.sliderChange} />
+                <InputSlider name="BoxShadow" property="spread" title="Shadow Spread" value={this.state.preview.boxShadow.spread} min={-100} max={100} step={1} onSliderChange={this.sliderChange} />
                 <div className='col-4 list-label'>Shadow Color:</div><div className='col-8 text-right w-100'><PopoverPicker color={this.state.preview.boxShadow.color} onChange={(color: string) => this.setState({preview: {...this.state.preview, boxShadow: {...this.state.preview.boxShadow, color: color}}, previewItems: this.state.previewItems, selectedId: this.state.selectedId})} /></div>
               </li>
             </ul>
