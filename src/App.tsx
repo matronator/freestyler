@@ -80,7 +80,6 @@ class App extends Component<AppProps, AppState> {
       ],
       selectedId: newItem.id,
     }));
-    console.log(newItem);
   }
 
   addChild() {
@@ -113,7 +112,6 @@ class App extends Component<AppProps, AppState> {
       })],
       selectedId: newItem.id,
     }));
-    console.log(this.state.previewItems);
   }
 
   borderSelectChange(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -173,7 +171,6 @@ class App extends Component<AppProps, AppState> {
         selectedId: selectedItem.id,
       }));
     }
-    console.log(this.state.previewItems);
   }
 
   render(): React.ReactNode {
