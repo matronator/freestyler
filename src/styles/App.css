@@ -39,6 +39,7 @@
 main {
   width: 1024px;
   min-height: 480px;
+  max-height: 600px;
   margin: 0 auto;
   display: grid;
   grid-template-areas:
@@ -52,6 +53,7 @@ main {
   grid-area: l;
   width: 320px;
   background-color: #aaaaaa;
+  overflow-y: scroll;
 }
 
 .property-list ul {

@@ -3,12 +3,14 @@ import './styles/preview.css';
 import './styles/grid.css';
 import './styles/utils.css';
 import React, { Component } from 'react';
-import { Preview, initPreview } from './controls/Preview';
+import { Preview, initPreview, PreviewType } from './controls/Preview';
 import { InputSlider } from './controls/Input/InputSlider';
 import { BorderStyle } from './properties/Border';
 import { BorderControl } from './controls/Input/BorderControl';
 import { PopoverPicker } from './controls/Input/PopoverPicker';
 import { PreviewItem, PreviewList } from './controls/PreviewList';
+import { SelectInput } from './controls/Input/SelectInput';
+import { Position } from './properties/Position';
 
 interface AppProps {
 
@@ -17,17 +19,19 @@ interface AppProps {
 interface AppState {
   preview: Preview;
   previewItems: PreviewItem[];
-  selectedId: number;
+  selectedId: number | string;
 }
 
 class App extends Component<AppProps, AppState> {
   constructor(props: AppProps) {
     super(props);
     const newPreview = initPreview(0);
-    this.state = {preview: newPreview, previewItems: [{ id: 0, preview: newPreview, selected: true }], selectedId: 0 };
+    this.state = {preview: newPreview, previewItems: [{ id: 0, preview: newPreview, selected: true, isParent: true, children: null }], selectedId: 0 };
     this.sliderChange = this.sliderChange.bind(this);
-    this.selectChange = this.selectChange.bind(this);
+    this.borderSelectChange = this.borderSelectChange.bind(this);
+    this.positionSelectChange = this.positionSelectChange.bind(this);
     this.addPreviewItem = this.addPreviewItem.bind(this);
+    this.addChild = this.addChild.bind(this);
     this.selectItem = this.selectItem.bind(this);
   }
 
@@ -38,7 +42,7 @@ class App extends Component<AppProps, AppState> {
           ...prevState.preview,
           [property]: value,
         },
-        previewItems: [...prevState.previewItems],
+        previewItems: prevState.previewItems,
         selectedId: prevState.selectedId,
       } : {
         preview: {
@@ -48,17 +52,19 @@ class App extends Component<AppProps, AppState> {
             [subprop]: value,
           },
         },
-        previewItems: [...prevState.previewItems],
+        previewItems: prevState.previewItems,
         selectedId: prevState.selectedId,
       }
     ));
   }
 
   addPreviewItem() {
-    const newItem = {
+    const newItem: PreviewItem = {
       id: this.state.previewItems.length,
       preview: initPreview(this.state.previewItems.length),
       selected: true,
+      children: null,
+      isParent: true,
     };
     this.setState(prevState => ({
       preview: newItem.preview,
@@ -74,9 +80,43 @@ class App extends Component<AppProps, AppState> {
       ],
       selectedId: newItem.id,
     }));
+    console.log(this.state.previewItems);
   }
 
-  selectChange(e: React.ChangeEvent<HTMLSelectElement>) {
+  addChild() {
+    const id = `${this.state.selectedId}-${(this.state.preview.children && this.state.preview.children?.length > 0) ? this.state.preview.children?.length : 0}`;
+    const newItem: PreviewItem = {
+      id: id,
+      preview: initPreview(id, true),
+      selected: true,
+      children: null,
+      isParent: false,
+    };
+    this.setState(prevState => ({
+      preview: newItem.preview,
+      previewItems: [...prevState.previewItems.map((item, index) => {
+        if (item.selected === true) {
+          item.preview = prevState.preview;
+          if (item.preview.children === null || typeof item.preview.children === 'undefined') {
+            item.preview.children = [newItem.preview];
+          } else {
+            item.preview.children.push(newItem.preview);
+          }
+          if (item.children === null || typeof item.children === 'undefined') {
+            item.children = [newItem];
+          } else {
+            item.children.push(newItem);
+          }
+        }
+        item.selected = false;
+        return item;
+      })],
+      selectedId: newItem.id,
+    }));
+    console.log(this.state.previewItems);
+  }
+
+  borderSelectChange(e: React.ChangeEvent<HTMLSelectElement>) {
     this.setState(prevState => ({
       preview: {
         ...prevState.preview,
@@ -90,8 +130,20 @@ class App extends Component<AppProps, AppState> {
     }));
   }
 
-  selectItem(id: number) {
-    const selectedItem = this.state.previewItems.find(item => item.id === id);
+  positionSelectChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    this.setState(prevState => ({
+      preview: {
+        ...prevState.preview,
+        position: (e.target.value) as Position
+      },
+      previewItems: prevState.previewItems,
+      selectedId: prevState.selectedId,
+    }));
+  }
+
+  selectItem(id: number | string) {
+    const selectedItem = typeof id === 'number' ? this.state.previewItems.find(item => item.id === id) :
+      this.state.previewItems.find(item => item.id.toString() === id.substring(0, id.indexOf('-')))?.children?.find(child => child.id === id);
     if (selectedItem) {
       console.log("item selected: " + selectedItem.id);
       selectedItem.selected = true;
@@ -100,8 +152,18 @@ class App extends Component<AppProps, AppState> {
         previewItems: prevState.previewItems.map((item, index) => {
           if (item.id === prevState.preview.id) {
             item.preview = prevState.preview;
+          } else {
+            if (item.children && typeof item.children !== 'undefined') {
+              item.children.forEach(child => {
+                if (child.id === prevState.selectedId) {
+                  child.preview = prevState.preview;
+                } else {
+                  child.selected = false;
+                }
+              });
+            }
+            item.selected = false;
           }
-          item.selected = false;
           return item;
         }),
         selectedId: selectedItem.id,
@@ -115,13 +177,17 @@ class App extends Component<AppProps, AppState> {
         <main>
           <nav className="property-list">
             <ul>
+              {this.state.preview.type === PreviewType.Child &&
+                <li><div className='col-4 list-label'>Position:</div><div className='col-8 text-left w-100'><SelectInput id='position' name='position' items={Object.values(Position)} value={this.state.preview.position} onChange={this.positionSelectChange} /></div></li>
+              }
               <li><InputSlider name="Width" min={0} max={400} step={1} onSliderChange={this.sliderChange} value={this.state.preview.width} /></li>
               <li><InputSlider name="Height" min={0} max={300} step={1} onSliderChange={this.sliderChange} value={this.state.preview.height} /></li>
               <li><div className='col-4 list-label'>Background:</div><div className='col-8 text-right w-100'><PopoverPicker color={this.state.preview.backgroundColor} onChange={(color: string) => this.setState({preview: {...this.state.preview, backgroundColor: color}, previewItems: this.state.previewItems, selectedId: this.state.selectedId})} /></div></li>
               <li><BorderControl
                   color={this.state.preview.border.color}
+                  selectValue={this.state.preview.border.style}
                   onPickerChange={(color: string) => this.setState({preview: {...this.state.preview, border: {...this.state.preview.border, color: color}}})}
-                  onSelectChange={this.selectChange}
+                  onSelectChange={this.borderSelectChange}
                   sliderProps={{ min: 0, max: 100, step: 1, value: this.state.preview.border.width, property: 'width', name: 'Border', onSliderChange: this.sliderChange }} />
               </li>
               <li><InputSlider name="Border" property="radius" title="Border radius" value={this.state.preview.border.radius} min={0} max={200} step={1} onSliderChange={this.sliderChange} /></li>
@@ -132,6 +198,18 @@ class App extends Component<AppProps, AppState> {
                 <InputSlider name="BoxShadow" property="spread" title="Shadow Spread" value={this.state.preview.boxShadow.spread} min={-100} max={100} step={1} onSliderChange={this.sliderChange} />
                 <div className='col-4 list-label'>Shadow Color:</div><div className='col-8 text-right w-100'><PopoverPicker color={this.state.preview.boxShadow.color} onChange={(color: string) => this.setState({preview: {...this.state.preview, boxShadow: {...this.state.preview.boxShadow, color: color}}, previewItems: this.state.previewItems, selectedId: this.state.selectedId})} /></div>
               </li>
+              <li>
+                <InputSlider name="Margin" property="top" title="Margin Top" value={this.state.preview.margin.top} min={-100} max={200} step={1} onSliderChange={this.sliderChange} />
+                <InputSlider name="Margin" property="right" title="Margin Right" value={this.state.preview.margin.right} min={-100} max={200} step={1} onSliderChange={this.sliderChange} />
+                <InputSlider name="Margin" property="bottom" title="Margin Bottom" value={this.state.preview.margin.bottom} min={-100} max={200} step={1} onSliderChange={this.sliderChange} />
+                <InputSlider name="Margin" property="left" title="Margin Left" value={this.state.preview.margin.left} min={-100} max={200} step={1} onSliderChange={this.sliderChange} />
+              </li>
+              <li>
+                <InputSlider name="Padding" property="top" title="Padding Top" value={this.state.preview.padding.top} min={0} max={100} step={1} onSliderChange={this.sliderChange} />
+                <InputSlider name="Padding" property="right" title="Padding Right" value={this.state.preview.padding.right} min={0} max={100} step={1} onSliderChange={this.sliderChange} />
+                <InputSlider name="Padding" property="bottom" title="Padding Bottom" value={this.state.preview.padding.bottom} min={0} max={100} step={1} onSliderChange={this.sliderChange} />
+                <InputSlider name="Padding" property="left" title="Padding Left" value={this.state.preview.padding.left} min={0} max={100} step={1} onSliderChange={this.sliderChange} />
+              </li>
             </ul>
           </nav>
 
@@ -141,6 +219,7 @@ class App extends Component<AppProps, AppState> {
 
           <aside className="tools">
             <button onClick={this.addPreviewItem}>Add Item</button>
+            <button onClick={this.addChild}>Add Child</button>
           </aside>
         </main>
       </div>

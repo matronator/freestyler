@@ -33,7 +33,7 @@
         linear-gradient(-135deg, transparent 50%, var(--blue-light) 50%),
         linear-gradient(-225deg, transparent 50%, var(--blue-light) 50%),
         linear-gradient(var(--blue-light) 42%, var(--blue-darker) 42%),
-        linear-gradient(var(--light), var(--grey-light));
+        linear-gradient(#f0faff 20%, #dcecf4 70%, #d5e3ef 100%);
     background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
     background-size: 1px 100%, 20px 22px, 20px 22px, 20px 100%, calc(100% - 19px) 100%;
     background-position: right 20px center, right bottom, right bottom, right bottom, left top;
@@ -43,7 +43,8 @@ select.select-input:hover {
     background-image: linear-gradient(var(--arrowFg), var(--arrowFg)),
         linear-gradient(-135deg, transparent 50%, var(--arrowFg) 50%),
         linear-gradient(-225deg, transparent 50%, var(--arrowFg) 50%),
-        linear-gradient(var(--arrowFg) 42%, var(--arrowBg) 42%);
+        linear-gradient(var(--arrowFg) 42%, var(--arrowBg) 42%),
+        linear-gradient(#d5e3ef 0%, #dcecf4 30%, #f0faff 80%);
 }
 
 select.select-input:active {

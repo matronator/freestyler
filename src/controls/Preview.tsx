@@ -1,23 +1,47 @@
 import React, { Component, MouseEvent, ReactNode } from "react";
+import { Box } from "../properties/Box";
+import { Position } from "../properties/Position";
 import { Border, BorderStyle } from "./../properties/Border";
 import { BoxShadow } from "./../properties/BoxShadow";
+import { PreviewList } from "./PreviewList";
+
+export enum PreviewType {
+  Parent = 'parent',
+  Child = 'child',
+}
+export enum PreviewElement {
+  Div = 'div',
+  Paragraph = 'paragraph',
+  Heading = 'heading',
+  Subheading = 'subheading',
+}
 
 export interface Preview {
     [key: string]: any;
-    id: number;
+    id: number | string;
+    children?: Preview[] | null;
+    type: PreviewType;
+    element: PreviewElement;
+    position: Position;
     width: number;
     height: number;
     backgroundColor: string;
     border: Border;
     boxShadow: BoxShadow;
+    margin: Box;
+    padding: Box;
 }
 
-export function initPreview(id: number): Preview {
+export function initPreview(id: number | string, isChild = false, element?: PreviewElement): Preview {
   return {
     id: id,
-    width: 100,
-    height: 100,
-    backgroundColor: '#cecece',
+    children: null,
+    type: isChild ? PreviewType.Child : PreviewType.Parent,
+    element: element ?? PreviewElement.Div,
+    position: Position.Relative,
+    width: isChild ? 25 : 100,
+    height: isChild ? 25 : 100,
+    backgroundColor: isChild ? '#cecece' : '#bababa',
     border: {
       width: 0,
       color: '#999999',
@@ -30,15 +54,28 @@ export function initPreview(id: number): Preview {
       blur: 0,
       spread: 0,
       color: '#000000',
-    }
+    },
+    margin: {
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
+    },
+    padding: {
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
+    },
   };
 }
 
 interface PreviewDivProps {
   preview: Preview;
   selected: boolean;
-  onClick: (id: number) => void;
-  id: number;
+  onClick: (id: number | string) => void;
+  id: number | string;
+  children?: ReactNode;
 }
 interface PreviewDivState {
   preview: Preview;
@@ -50,20 +87,46 @@ export class PreviewDiv extends Component<PreviewDivProps, PreviewDivState> {
     this.handleClick = this.handleClick.bind(this);
   }
 
-  handleClick(event: MouseEvent<HTMLDivElement>, id: number) {
+  handleClick(event: MouseEvent<HTMLDivElement>, id: number | string) {
+    event.stopPropagation();
     this.props.onClick(id);
   }
 
   render(): ReactNode {
-    return (
-      <div style={{
-        width: `${this.props.preview.width}px`,
-        height: `${this.props.preview.height}px`,
-        border: `${this.props.preview.border.width}px ${this.props.preview.border.style} ${this.props.preview.border.color}`,
-        borderRadius: `${this.props.preview.border.radius}px`,
-        backgroundColor: this.props.preview.backgroundColor,
-        boxShadow: `${this.props.preview.boxShadow.x}px ${this.props.preview.boxShadow.y}px ${this.props.preview.boxShadow.blur}px ${this.props.preview.boxShadow.spread}px ${this.props.preview.boxShadow.color}`,
-      }} id="preview" onClick={(event) => this.handleClick(event, this.props.id)}></div>
-    );
+    const style = {
+      width: `${this.props.preview.width}px`,
+      height: `${this.props.preview.height}px`,
+      border: `${this.props.preview.border.width}px ${this.props.preview.border.style} ${this.props.preview.border.color}`,
+      borderRadius: `${this.props.preview.border.radius}px`,
+      backgroundColor: this.props.preview.backgroundColor,
+      boxShadow: `${this.props.preview.boxShadow.x}px ${this.props.preview.boxShadow.y}px ${this.props.preview.boxShadow.blur}px ${this.props.preview.boxShadow.spread}px ${this.props.preview.boxShadow.color}`,
+      margin: `${this.props.preview.margin.top}px ${this.props.preview.margin.right}px ${this.props.preview.margin.bottom}px ${this.props.preview.margin.left}px`,
+    };
+
+    switch(this.props.preview.element) {
+      case PreviewElement.Paragraph:
+        return (
+          <p style={style} className='preview-item' onClick={(event) => this.handleClick(event, this.props.id)}>{this.props.children}</p>
+        );
+        break;
+      case PreviewElement.Heading:
+        return (
+          <h2 style={style} className='preview-item' onClick={(event) => this.handleClick(event, this.props.id)}>{this.props.children}</h2>
+        );
+        break;
+      case PreviewElement.Subheading:
+        return (
+          <h3 style={style} className='preview-item' onClick={(event) => this.handleClick(event, this.props.id)}>{this.props.children}</h3>
+        );
+        break;
+      case PreviewElement.Div:
+      default:
+        return (
+          <div style={style} className='preview-item' data-id-id={this.props.id} onClick={(event) => this.handleClick(event, this.props.id)}>
+            {this.props.children}
+          </div>
+        );
+        break;
+    }
   }
 }

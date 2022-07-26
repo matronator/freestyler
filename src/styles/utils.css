@@ -1,6 +1,6 @@
-.text-right { text-align: right; }
-.text-left { text-align: left; }
-.text-center { text-align: center; }
+.text-right { text-align: right !important; }
+.text-left { text-align: left !important; }
+.text-center { text-align: center !important; }
 
 .w-100 { width: 100%; }
 .w-90 { width: 90%; }
