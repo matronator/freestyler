@@ -80,7 +80,7 @@ class App extends Component<AppProps, AppState> {
       ],
       selectedId: newItem.id,
     }));
-    console.log(this.state.previewItems);
+    console.log(newItem);
   }
 
   addChild() {
@@ -149,7 +149,7 @@ class App extends Component<AppProps, AppState> {
       selectedItem.selected = true;
       this.setState(prevState => ({
         preview: selectedItem.preview,
-        previewItems: prevState.previewItems.map((item, index) => {
+        previewItems: [...prevState.previewItems.map((item, index) => {
           if (item.id === prevState.preview.id) {
             item.preview = prevState.preview;
           } else {
@@ -162,13 +162,18 @@ class App extends Component<AppProps, AppState> {
                 }
               });
             }
+          }
+          if (item.id !== selectedItem.id) {
             item.selected = false;
+          } else {
+            item.selected = true;
           }
           return item;
-        }),
+        })],
         selectedId: selectedItem.id,
       }));
     }
+    console.log(this.state.previewItems);
   }
 
   render(): React.ReactNode {
