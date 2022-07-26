@@ -122,7 +122,7 @@ class App extends Component<AppProps, AppState> {
                   color={this.state.preview.border.color}
                   onPickerChange={(color: string) => this.setState({preview: {...this.state.preview, border: {...this.state.preview.border, color: color}}})}
                   onSelectChange={this.selectChange}
-                  sliderProps={{ min: 0, max: 100, step: 1, value: 0, property: 'width', name: 'Border', onSliderChange: this.sliderChange }} />
+                  sliderProps={{ min: 0, max: 100, step: 1, value: this.state.preview.border.width, property: 'width', name: 'Border', onSliderChange: this.sliderChange }} />
               </li>
               <li><InputSlider name="Border" property="radius" title="Border radius" value={this.state.preview.border.radius} min={0} max={200} step={1} onSliderChange={this.sliderChange} /></li>
               <li>
