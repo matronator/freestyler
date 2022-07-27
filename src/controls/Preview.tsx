@@ -97,13 +97,14 @@ export class PreviewDiv extends Component<PreviewDivProps, PreviewDivState> {
 
   render(): ReactNode {
     const style = {
-      width: `${this.props.preview.width}px`,
-      height: `${this.props.preview.height}px`,
+      width: `${this.props.preview.width}${this.props.preview.type === PreviewType.Child ? '%' : 'px'}`,
+      height: `${this.props.preview.height}${this.props.preview.type === PreviewType.Child ? '%' : 'px'}`,
       border: `${this.props.preview.border.width}px ${this.props.preview.border.style} ${this.props.preview.border.color}`,
       borderRadius: `${this.props.preview.border.radius}px`,
       backgroundColor: this.props.preview.backgroundColor,
       boxShadow: `${this.props.preview.boxShadow.x}px ${this.props.preview.boxShadow.y}px ${this.props.preview.boxShadow.blur}px ${this.props.preview.boxShadow.spread}px ${this.props.preview.boxShadow.color}`,
       margin: `${this.props.preview.margin.top}px ${this.props.preview.margin.right}px ${this.props.preview.margin.bottom}px ${this.props.preview.margin.left}px`,
+      padding: `${this.props.preview.padding.top}px ${this.props.preview.padding.right}px ${this.props.preview.padding.bottom}px ${this.props.preview.padding.left}px`,
     };
 
     switch(this.props.preview.element) {

@@ -178,13 +178,13 @@ class App extends Component<AppProps, AppState> {
           <nav className="property-list">
             <ul>
               <li>
-                <div className='col-6 list-label text-left'>Position:</div>
-                <div className='col-6 list-label text-left'>Display:</div>
-                <div className='col-6 text-left w-100'><SelectInput id='position' name='position' type='Position' items={Object.values(Position)} value={this.state.preview.position} onSelectChange={this.selectChange} /></div>
-                <div className='col-6 text-left w-100'><SelectInput id='display' name='display' items={Object.values(Display)} value={this.state.preview.display} onSelectChange={this.selectChange} /></div>
+                <div className='col-6 list-label text-center'>Position:</div>
+                <div className='col-6 list-label text-center'>Display:</div>
+                <div className='col-6 text-center w-100'><SelectInput id='position' name='position' type='Position' items={Object.values(Position)} value={this.state.preview.position} onSelectChange={this.selectChange} /></div>
+                <div className='col-6 text-center w-100'><SelectInput id='display' name='display' items={Object.values(Display)} value={this.state.preview.display} onSelectChange={this.selectChange} /></div>
               </li>
-              <li><InputSlider name="Width" min={0} max={400} step={1} onSliderChange={this.sliderChange} value={this.state.preview.width} /></li>
-              <li><InputSlider name="Height" min={0} max={300} step={1} onSliderChange={this.sliderChange} value={this.state.preview.height} /></li>
+              <li><InputSlider name="Width" title={this.state.preview.type === PreviewType.Child ? 'Width in %' : undefined} min={0} max={400} step={1} relative={this.state.preview.type === PreviewType.Child} onSliderChange={this.sliderChange} value={this.state.preview.width} /></li>
+              <li><InputSlider name="Height" title={this.state.preview.type === PreviewType.Child ? 'Height in %' : undefined} min={0} max={300} step={1} relative={this.state.preview.type === PreviewType.Child} onSliderChange={this.sliderChange} value={this.state.preview.height} /></li>
               <li><div className='col-4 list-label'>Background:</div><div className='col-8 text-right w-100'><PopoverPicker color={this.state.preview.backgroundColor} onChange={(color: string) => this.setState({preview: {...this.state.preview, backgroundColor: color}, previewItems: this.state.previewItems, selectedId: this.state.selectedId})} /></div></li>
               <li><BorderControl
                   color={this.state.preview.border.color}
