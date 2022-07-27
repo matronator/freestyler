@@ -8,7 +8,7 @@ interface BorderControlProps {
     sliderProps: InputSliderProps;
     color: string;
     onPickerChange: Function;
-    onSelectChange: ChangeEventHandler<HTMLSelectElement>;
+    onSelectChange: Function;
     selectValue: BorderStyle;
 }
 
@@ -29,7 +29,7 @@ export class BorderControl extends Component<BorderControlProps, BorderControlSt
                     step={this.props.sliderProps.step}
                     onSliderChange={this.props.sliderProps.onSliderChange}/>
                 <div className='col-4 mt-2'>
-                    <SelectInput className='w-90' name='borderStyle' id='borderStyle' onChange={this.props.onSelectChange} items={Object.values(BorderStyle)} value={this.props.selectValue} />
+                    <SelectInput className='w-90' name='border' property='style' id='borderStyle' onSelectChange={this.props.onSelectChange} items={Object.values(BorderStyle)} value={this.props.selectValue} />
                 </div>
                 <div className="col-8 text-right w-100 mt-2">
                     <PopoverPicker color={this.props.color} onChange={this.props.onPickerChange} />

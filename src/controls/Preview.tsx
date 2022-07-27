@@ -1,5 +1,6 @@
 import React, { Component, MouseEvent, ReactNode } from "react";
 import { Box } from "../properties/Box";
+import { Display } from "../properties/Display";
 import { Position } from "../properties/Position";
 import { Border, BorderStyle } from "./../properties/Border";
 import { BoxShadow } from "./../properties/BoxShadow";
@@ -23,6 +24,7 @@ export interface Preview {
     type: PreviewType;
     element: PreviewElement;
     position: Position;
+    display: Display;
     width: number;
     height: number;
     backgroundColor: string;
@@ -39,8 +41,9 @@ export function initPreview(id: number | string, isChild = false, element?: Prev
     type: isChild ? PreviewType.Child : PreviewType.Parent,
     element: element ?? PreviewElement.Div,
     position: Position.Relative,
-    width: isChild ? 25 : 100,
-    height: isChild ? 25 : 100,
+    display: Display.Flex,
+    width: isChild ? 50 : 100,
+    height: isChild ? 50 : 100,
     backgroundColor: isChild ? '#cecece' : '#bababa',
     border: {
       width: 0,
