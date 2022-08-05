@@ -90,9 +90,9 @@ export class PreviewDiv extends Component<PreviewDivProps, PreviewDivState> {
     this.handleClick = this.handleClick.bind(this);
   }
 
-  handleClick(event: MouseEvent<HTMLDivElement>, id: number | string) {
+  handleClick(event: MouseEvent<HTMLElement>) {
     event.stopPropagation();
-    this.props.onClick(id);
+    this.props.onClick(this.props.id);
   }
 
   render(): ReactNode {
@@ -110,23 +110,23 @@ export class PreviewDiv extends Component<PreviewDivProps, PreviewDivState> {
     switch(this.props.preview.element) {
       case PreviewElement.Paragraph:
         return (
-          <p style={style} className='preview-item' onClick={(event) => this.handleClick(event, this.props.id)}>{this.props.children}</p>
+          <p style={style} className={this.props.selected ? 'preview-item selected' : 'preview-item'} onClick={this.handleClick}>{this.props.children}</p>
         );
         break;
       case PreviewElement.Heading:
         return (
-          <h2 style={style} className='preview-item' onClick={(event) => this.handleClick(event, this.props.id)}>{this.props.children}</h2>
+          <h2 style={style} className={this.props.selected ? 'preview-item selected' : 'preview-item'} onClick={this.handleClick}>{this.props.children}</h2>
         );
         break;
       case PreviewElement.Subheading:
         return (
-          <h3 style={style} className='preview-item' onClick={(event) => this.handleClick(event, this.props.id)}>{this.props.children}</h3>
+          <h3 style={style} className={this.props.selected ? 'preview-item selected' : 'preview-item'} onClick={this.handleClick}>{this.props.children}</h3>
         );
         break;
       case PreviewElement.Div:
       default:
         return (
-          <div style={style} className='preview-item' data-id-id={this.props.id} onClick={(event) => this.handleClick(event, this.props.id)}>
+          <div style={style} className={this.props.selected ? 'preview-item selected' : 'preview-item'} data-id-id={this.props.id} onClick={this.handleClick}>
             {this.props.children}
           </div>
         );

@@ -8,4 +8,9 @@
 .preview-item {
     display: flex;
     flex-wrap: wrap;
+    box-sizing: border-box;
+}
+
+.preview-item.selected {
+    filter: drop-shadow(0 0 5px #ffd900);
 }

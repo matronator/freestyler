@@ -1,6 +1,7 @@
 import './styles/App.css';
 import './styles/preview.css';
 import './styles/grid.css';
+import './styles/form.css';
 import './styles/utils.css';
 import React, { Component } from 'react';
 import { Preview, initPreview, PreviewType } from './controls/Preview';
@@ -72,6 +73,15 @@ class App extends Component<AppProps, AppState> {
         ...prevState.previewItems.map((item, index) => {
           if (item.id === prevState.preview.id) {
             item.preview = prevState.preview;
+          } else {
+            if (item.children && typeof item.children !== 'undefined') {
+              item.children.forEach(child => {
+                if (child.id === prevState.selectedId) {
+                  child.preview = prevState.preview;
+                }
+                child.selected = false;
+              });
+            }
           }
           item.selected = false;
           return item;
@@ -141,7 +151,6 @@ class App extends Component<AppProps, AppState> {
     const selectedItem = typeof id === 'number' ? this.state.previewItems.find(item => item.id === id) :
       this.state.previewItems.find(item => item.id.toString() === id.substring(0, id.indexOf('-')))?.children?.find(child => child.id === id);
     if (selectedItem) {
-      console.log("item selected: " + selectedItem.id);
       selectedItem.selected = true;
       this.setState(prevState => ({
         preview: selectedItem.preview,
@@ -151,8 +160,11 @@ class App extends Component<AppProps, AppState> {
           } else {
             if (item.children && typeof item.children !== 'undefined') {
               item.children.forEach(child => {
-                if (child.id === prevState.selectedId) {
+                if (child.id === prevState.selectedId && child.id !== selectedItem.id) {
                   child.preview = prevState.preview;
+                  child.selected = false;
+                } else if (child.id === selectedItem.id) {
+                  child.selected = true;
                 } else {
                   child.selected = false;
                 }
@@ -223,6 +235,14 @@ class App extends Component<AppProps, AppState> {
           <aside className="tools">
             <button onClick={this.addPreviewItem}>Add Item</button>
             <button onClick={this.addChild}>Add Child</button>
+            <div className="row justify-center">
+              <div className="col label">
+                Element class:
+              </div>
+              <div className="col">
+                <input type="text" name="classname" id="classname" className='input-text' />
+              </div>
+            </div>
           </aside>
         </main>
       </div>

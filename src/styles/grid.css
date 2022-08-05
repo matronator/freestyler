@@ -1,7 +1,19 @@
+.row {
+    display: flex;
+    flex-direction: row;
+}
+.justify-around { justify-content: space-around; }
+.justify-center { justify-content: center; }
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+}
+
 .grid-24 {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-};
+}
 
 .col-1 { grid-column-start: span 1; }
 .col-2 { grid-column-start: span 2; }
