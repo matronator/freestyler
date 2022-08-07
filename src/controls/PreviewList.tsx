@@ -1,4 +1,4 @@
-import { PureComponent, ReactNode } from "react";
+import { PureComponent } from "react";
 import { Preview, PreviewDiv } from "./Preview";
 
 export interface PreviewItem {
@@ -27,6 +27,6 @@ export class PreviewList extends PureComponent<PreviewListProps, PreviewListStat
                     <PreviewDiv key={child.id} id={child.id} onClick={() => this.props.onSelectItem(child.id)} selected={child.selected} preview={child.id === this.props.activeIndex ? this.props.activePreview : child.preview} />
                 )}
             </PreviewDiv>
-        ) || null;
+        );
     }
 }

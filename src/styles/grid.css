@@ -4,6 +4,7 @@
 }
 .justify-around { justify-content: space-around; }
 .justify-center { justify-content: center; }
+.align-middle { align-items: center; }
 
 .grid {
     display: grid;

@@ -1,8 +1,10 @@
 .preview-window {
     grid-area: p;
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
+    overflow: scroll;
 }
 
 .preview-item {
@@ -11,6 +13,6 @@
     box-sizing: border-box;
 }
 
-.preview-item.selected {
+.App:not(.no-highlight) .preview-item.selected {
     filter: drop-shadow(0 0 5px #ffd900);
 }

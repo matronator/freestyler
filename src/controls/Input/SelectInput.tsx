@@ -1,6 +1,5 @@
 import './SelectInput.css';
-import { ChangeEventHandler, Component, CSSProperties, ReactNode } from "react";
-import { Type } from 'typescript';
+import { Component, CSSProperties, ReactNode } from "react";
 
 interface SelectInputProps {
     name: string;

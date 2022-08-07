@@ -54,35 +54,32 @@ main {
   width: 320px;
   background-color: #aaaaaa;
   overflow-y: scroll;
-}
-
-.property-list ul {
-  list-style: none;
-  padding-inline-start: 0;
-}
-
-.property-list ul > li {
-  position: relative;
-  margin-bottom: .5rem;
-  padding-bottom: .5rem;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-  row-gap: 4px;
-  column-gap: 3px;
-  align-items: center;
-  border-bottom: .5px solid #222;
-}
-
-.property-list .list-label {
-  text-align: right;
-  padding-right: .25rem;
-  font-size: 0.75rem;
-  font-family: 'Dosis', sans-serif;
-  font-weight: 500;
-  text-transform: uppercase;
-}
-.property-list ul > li > :nth-child(2) {
-  text-align: right;
+  ul {
+    list-style: none;
+    padding-inline-start: 0;
+    > li {
+      position: relative;
+      margin-bottom: .5rem;
+      padding-bottom: .5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+      row-gap: 4px;
+      column-gap: 3px;
+      align-items: center;
+      border-bottom: .5px solid #222;
+      > :nth-child(2) {
+        text-align: right;
+      }
+    }
+  }
+  .list-label {
+    text-align: right;
+    padding-right: .25rem;
+    font-size: 0.75rem;
+    font-family: 'Dosis', sans-serif;
+    font-weight: 500;
+    text-transform: uppercase;
+  }
 }
 /* .property-list ul > li > :last-child {
   justify-self: flex-end;
@@ -91,6 +88,13 @@ main {
 .tools {
   grid-area: t;
   background-color: #c0c0c0;
+
+  .tools-global {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .5rem;
+  }
 }
 
 .picker {

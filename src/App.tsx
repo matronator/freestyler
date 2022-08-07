@@ -1,18 +1,20 @@
-import './styles/App.css';
+import './styles/App.scss';
 import './styles/preview.css';
 import './styles/grid.css';
 import './styles/form.css';
 import './styles/utils.css';
-import React, { Component } from 'react';
+import React, { ChangeEvent, Component } from 'react';
 import { Preview, initPreview, PreviewType } from './controls/Preview';
 import { InputSlider } from './controls/Input/InputSlider';
-import { BorderStyle } from './properties/Border';
 import { BorderControl } from './controls/Input/BorderControl';
 import { PopoverPicker } from './controls/Input/PopoverPicker';
 import { PreviewItem, PreviewList } from './controls/PreviewList';
 import { SelectInput } from './controls/Input/SelectInput';
 import { Position } from './properties/Position';
 import { Display } from './properties/Display';
+import Switch from 'react-switch';
+import { ExportModal } from './controls/Modals/ExportModal';
+import { Button } from './controls/Button/Button';
 
 interface AppProps {
 
@@ -22,18 +24,53 @@ interface AppState {
   preview: Preview;
   previewItems: PreviewItem[];
   selectedId: number | string;
+  highlight: boolean;
 }
 
 class App extends Component<AppProps, AppState> {
   constructor(props: AppProps) {
     super(props);
     const newPreview = initPreview(0);
-    this.state = {preview: newPreview, previewItems: [{ id: 0, preview: newPreview, selected: true, isParent: true, children: null }], selectedId: 0 };
+    this.state = {preview: newPreview, previewItems: [{ id: 0, preview: newPreview, selected: true, isParent: true, children: null }], selectedId: 0, highlight: true };
+    this.changeClass = this.changeClass.bind(this);
+    this.changeId = this.changeId.bind(this);
+    this.toggleHighlight = this.toggleHighlight.bind(this);
     this.sliderChange = this.sliderChange.bind(this);
     this.selectChange = this.selectChange.bind(this);
     this.addPreviewItem = this.addPreviewItem.bind(this);
     this.addChild = this.addChild.bind(this);
     this.selectItem = this.selectItem.bind(this);
+  }
+
+  changeClass(e: ChangeEvent<HTMLInputElement>) {
+    this.setState(prevState => (
+      {
+        ...prevState,
+        preview: {
+          ...prevState.preview,
+          className: e.target.value,
+        }
+      }
+    ));
+  }
+
+  changeId(e: ChangeEvent<HTMLInputElement>) {
+    this.setState(prevState => (
+      {
+        ...prevState,
+        preview: {
+          ...prevState.preview,
+          cssId: e.target.value,
+        }
+      }
+    ));
+  }
+
+  toggleHighlight(highlight: boolean) {
+    this.setState(prevState => ({
+      ...prevState,
+      highlight: highlight,
+    }));
   }
 
   sliderChange(value: number, property: string, subprop?: string) {
@@ -185,7 +222,7 @@ class App extends Component<AppProps, AppState> {
 
   render(): React.ReactNode {
     return (
-      <div className="App">
+      <div className={this.state.highlight ? 'App' : 'App no-highlight'}>
         <main>
           <nav className="property-list">
             <ul>
@@ -233,15 +270,33 @@ class App extends Component<AppProps, AppState> {
           </div>
 
           <aside className="tools">
-            <button onClick={this.addPreviewItem}>Add Item</button>
-            <button onClick={this.addChild}>Add Child</button>
-            <div className="row justify-center">
-              <div className="col label">
-                Element class:
-              </div>
+            <div className="tools-global">
+              <label className="label row align-middle">
+                Highlight selected <Switch onChange={this.toggleHighlight} checked={this.state.highlight} /> {this.state.highlight ? 'on' : 'off'}
+              </label>
               <div className="col">
-                <input type="text" name="classname" id="classname" className='input-text' />
+                <Button onClick={this.addPreviewItem} className='btn-sm'>&#10133; Add</Button>
+                <Button onClick={this.addChild} className='btn-sm' disabled={this.state.preview.id.toString().includes('-')}>&#10133; Child</Button>
               </div>
+            </div>
+            <div className="tools-element">
+              <div className="row justify-center">
+                <div className="col label">
+                  Element ID:
+                </div>
+                <div className="col">
+                  <input type="text" name="cssId" id="cssId" className='input-text' value={this.state.preview.cssId} onChange={this.changeId} />
+                </div>
+              </div>
+              <div className="row justify-center">
+                <div className="col label">
+                  CSS Class:
+                </div>
+                <div className="col">
+                  <input type="text" name="classname" id="classname" className='input-text' value={this.state.preview.className} onChange={this.changeClass} />
+                </div>
+              </div>
+              <ExportModal />
             </div>
           </aside>
         </main>
@@ -249,60 +304,5 @@ class App extends Component<AppProps, AppState> {
     );
   }
 }
-
-// const preview: Preview = {
-//   width: 100,
-//   height: 100,
-//   border: 0,
-//   borderStyle: "solid",
-// };
-
-// function sliderChange(value: number, property: string) {
-//   preview[property] = value;
-//   const previewDiv = document.getElementById('preview');
-//   if (previewDiv) {
-//     previewDiv.style.width = `${preview.width}px`;
-//     previewDiv.style.height = `${preview.height}px`;
-//     previewDiv.style.border = `${preview.border}px ${preview.borderStyle} black`;
-//   }
-// }
-
-// function selectChange(e: React.ChangeEvent<HTMLSelectElement>) {
-//   preview.borderStyle = e.target.value;
-// }
-
-// function App() {
-//   return (
-//     <div className="App">
-//       <main>
-//         <nav className="property-list">
-//           <ul>
-//             <li><InputSlider name="Width" min={0} max={400} step={1} onSliderChange={sliderChange} /></li>
-//             <li><InputSlider name="Height" min={0} max={300} step={1} onSliderChange={sliderChange} /></li>
-//             <li>
-//               <InputSlider name="Border" min={0} max={100} step={1} onSliderChange={sliderChange} />
-//               <br />
-//               <select name="borderStyle" id="borderStyle" onChange={selectChange}>
-//                 <option value="none">None</option>
-//                 <option value="solid">Solid</option>
-//                 <option value="dashed">Dashed</option>
-//                 <option value="dotted">Dotted</option>
-//                 <option value="double">Double</option>
-//               </select>
-//             </li>
-//           </ul>
-//         </nav>
-
-//         <div className="preview-window">
-//           <div id="preview"></div>
-//         </div>
-
-//         <aside className="tools">
-
-//         </aside>
-//       </main>
-//     </div>
-//   );
-// }
 
 export default App;

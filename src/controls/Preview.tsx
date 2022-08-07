@@ -4,7 +4,6 @@ import { Display } from "../properties/Display";
 import { Position } from "../properties/Position";
 import { Border, BorderStyle } from "./../properties/Border";
 import { BoxShadow } from "./../properties/BoxShadow";
-import { PreviewList } from "./PreviewList";
 
 export enum PreviewType {
   Parent = 'parent',
@@ -20,6 +19,8 @@ export enum PreviewElement {
 export interface Preview {
     [key: string]: any;
     id: number | string;
+    cssId: string;
+    className: string;
     children?: Preview[] | null;
     type: PreviewType;
     element: PreviewElement;
@@ -37,6 +38,8 @@ export interface Preview {
 export function initPreview(id: number | string, isChild = false, element?: PreviewElement): Preview {
   return {
     id: id,
+    cssId: `div${id}`,
+    className: 'div',
     children: null,
     type: isChild ? PreviewType.Child : PreviewType.Parent,
     element: element ?? PreviewElement.Div,
@@ -112,17 +115,14 @@ export class PreviewDiv extends Component<PreviewDivProps, PreviewDivState> {
         return (
           <p style={style} className={this.props.selected ? 'preview-item selected' : 'preview-item'} onClick={this.handleClick}>{this.props.children}</p>
         );
-        break;
       case PreviewElement.Heading:
         return (
           <h2 style={style} className={this.props.selected ? 'preview-item selected' : 'preview-item'} onClick={this.handleClick}>{this.props.children}</h2>
         );
-        break;
       case PreviewElement.Subheading:
         return (
           <h3 style={style} className={this.props.selected ? 'preview-item selected' : 'preview-item'} onClick={this.handleClick}>{this.props.children}</h3>
         );
-        break;
       case PreviewElement.Div:
       default:
         return (
@@ -130,7 +130,6 @@ export class PreviewDiv extends Component<PreviewDivProps, PreviewDivState> {
             {this.props.children}
           </div>
         );
-        break;
     }
   }
 }

@@ -1,4 +1,4 @@
-import { ChangeEventHandler, Component, ReactNode } from 'react';
+import { Component, ReactNode } from 'react';
 import { BorderStyle } from './../../properties/Border';
 import { InputSlider, InputSliderProps } from './InputSlider';
 import { PopoverPicker } from './PopoverPicker';

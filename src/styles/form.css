@@ -12,3 +12,8 @@
     border: none;
     border-radius: 5px;
 }
+
+.input-check {
+    width: 1rem;
+    height: 1rem;
+}
