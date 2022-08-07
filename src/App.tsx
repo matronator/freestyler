@@ -240,6 +240,11 @@ class App extends Component<AppProps, AppState> {
                 <div className='col-6 text-center w-100'><SelectInput id='position' name='position' type='Position' items={Object.values(Position)} value={this.state.preview.position} onSelectChange={this.selectChange} /></div>
                 <div className='col-6 text-center w-100'><SelectInput id='display' name='display' items={Object.values(Display)} value={this.state.preview.display} onSelectChange={this.selectChange} /></div>
               </li>
+              {[Display.Grid, Display.InlineGrid].includes(this.state.preview.display) && (
+                <li>
+                  <InputSlider name="GridColumns" title="Grid columns" value={this.state.preview.gridColumns} min={1} max={12} step={1} onSliderChange={this.sliderChange} />
+                </li>
+              )}
               {[Display.Flex, Display.Grid, Display.InlineFlex, Display.InlineGrid].includes(this.state.preview.display) && <li>
                 {[Display.Flex, Display.InlineFlex].includes(this.state.preview.display) && (
                   <>
@@ -289,7 +294,20 @@ class App extends Component<AppProps, AppState> {
           <aside className="tools">
             <div className="tools-global mb-auto">
               <label className="label row align-middle">
-                Highlight selected <Switch onChange={this.toggleHighlight} checked={this.state.highlight} className='mx-2' /> {this.state.highlight ? 'on' : 'off'}
+                Highlight selected
+                <Switch
+                  onChange={this.toggleHighlight}
+                  checked={this.state.highlight}
+                  className='mx-2'
+                  checkedIcon={false}
+                  uncheckedIcon={false}
+                  width={46}
+                  height={22}
+                  handleDiameter={24}
+                  boxShadow='1px 0 5px -1px #00000044'
+                  onColor='#219221'
+                />
+                {this.state.highlight ? 'on' : 'off'}
               </label>
               <div className="col">
                 <Button onClick={this.addPreviewItem} className='btn-sm mr-1'>&#10133; Add</Button>

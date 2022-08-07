@@ -30,6 +30,7 @@ export interface Preview {
     flexDirection: FlexDirection;
     justifyContent: JustifyContent;
     alignItems: AlignItems;
+    gridColumns: number;
     width: number;
     height: number;
     backgroundColor: string;
@@ -50,8 +51,9 @@ export function initPreview(id: number | string, isChild = false, element?: Prev
     position: Position.Relative,
     display: Display.Flex,
     flexDirection: FlexDirection.Row,
-    justifyContent: JustifyContent.Start,
-    alignItems: AlignItems.Start,
+    justifyContent: JustifyContent.FlexStart,
+    alignItems: AlignItems.FlexStart,
+    gridColumns: 4,
     width: isChild ? 50 : 100,
     height: isChild ? 50 : 100,
     backgroundColor: isChild ? '#cecece' : '#bababa',
@@ -109,6 +111,9 @@ export class PreviewDiv extends Component<PreviewDivProps, PreviewDivState> {
     const style = {
       display: this.props.preview.display,
       flexDirection: this.props.preview.flexDirection,
+      justifyContent: this.props.preview.justifyContent,
+      alignItems: this.props.preview.alignItems,
+      gridTemplateColumns: `repeat(${this.props.preview.gridColumns}, 1fr)`,
       width: `${this.props.preview.width}${this.props.preview.type === PreviewType.Child ? '%' : 'px'}`,
       height: `${this.props.preview.height}${this.props.preview.type === PreviewType.Child ? '%' : 'px'}`,
       border: `${this.props.preview.border.width}px ${this.props.preview.border.style} ${this.props.preview.border.color}`,

@@ -61,13 +61,19 @@ export class ExportAllModal extends Component<ExportAllModalProps, ExportAllModa
     }
 
     writeCss(preview: Preview): string {
-        return `#${preview.cssId} {
+        return exportCss(preview);
+    }
+}
+
+export const exportCss = (preview: Preview): string => {
+    return `#${preview.cssId} {
     display: ${preview.display};${[Display.Flex, Display.Grid, Display.InlineFlex, Display.InlineGrid].includes(preview.display) ?
     `
     justify-content: ${preview.justifyContent};
     align-items: ${preview.alignItems};`
     : ''}${[Display.Flex, Display.InlineFlex].includes(preview.display) ? `
-    flex-direction: ${preview.flexDirection};` : ''}
+    flex-direction: ${preview.flexDirection};` : ''}${[Display.Grid, Display.InlineGrid].includes(preview.display) ? `
+    grid-template-columns: repeat(${preview.gridColumns}, 1fr);` : ''}
     width: ${preview.width}${preview.type === PreviewType.Child ? '%' : 'px'};
     height: ${preview.height}${preview.type === PreviewType.Child ? '%' : 'px'};
     border: ${preview.border.width}px ${preview.border.style} ${preview.border.color};
@@ -77,5 +83,4 @@ export class ExportAllModal extends Component<ExportAllModalProps, ExportAllModa
     margin: ${preview.margin.top}px ${preview.margin.right}px ${preview.margin.bottom}px ${preview.margin.left}px;
     padding: ${preview.padding.top}px ${preview.padding.right}px ${preview.padding.bottom}px ${preview.padding.left}px;
 }`;
-    }
 }
