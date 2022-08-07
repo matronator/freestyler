@@ -15,6 +15,10 @@ import { Display } from './properties/Display';
 import Switch from 'react-switch';
 import { ExportModal } from './controls/Modals/ExportModal';
 import { Button } from './controls/Button/Button';
+import ClipboardJS from 'clipboard';
+import { FlexDirection } from './properties/Flex';
+
+new ClipboardJS(`.btn`);
 
 interface AppProps {
 
@@ -232,6 +236,10 @@ class App extends Component<AppProps, AppState> {
                 <div className='col-6 text-center w-100'><SelectInput id='position' name='position' type='Position' items={Object.values(Position)} value={this.state.preview.position} onSelectChange={this.selectChange} /></div>
                 <div className='col-6 text-center w-100'><SelectInput id='display' name='display' items={Object.values(Display)} value={this.state.preview.display} onSelectChange={this.selectChange} /></div>
               </li>
+              {this.state.preview.display === Display.Flex && <li>
+                <div className='col-12 list-label text-center'>Flex direction:</div>
+                <div className='col-12 text-center w-100'><SelectInput id='flexDirection' name='flexDirection' items={Object.values(FlexDirection)} value={this.state.preview.flexDirection} onSelectChange={this.selectChange} /></div>
+              </li>}
               <li><InputSlider name="Width" title={this.state.preview.type === PreviewType.Child ? 'Width in %' : undefined} min={0} max={400} step={1} relative={this.state.preview.type === PreviewType.Child} onSliderChange={this.sliderChange} value={this.state.preview.width} /></li>
               <li><InputSlider name="Height" title={this.state.preview.type === PreviewType.Child ? 'Height in %' : undefined} min={0} max={300} step={1} relative={this.state.preview.type === PreviewType.Child} onSliderChange={this.sliderChange} value={this.state.preview.height} /></li>
               <li><div className='col-4 list-label'>Background:</div><div className='col-8 text-right w-100'><PopoverPicker color={this.state.preview.backgroundColor} onChange={(color: string) => this.setState({preview: {...this.state.preview, backgroundColor: color}, previewItems: this.state.previewItems, selectedId: this.state.selectedId})} /></div></li>
@@ -272,10 +280,10 @@ class App extends Component<AppProps, AppState> {
           <aside className="tools">
             <div className="tools-global">
               <label className="label row align-middle">
-                Highlight selected <Switch onChange={this.toggleHighlight} checked={this.state.highlight} /> {this.state.highlight ? 'on' : 'off'}
+                Highlight selected <Switch onChange={this.toggleHighlight} checked={this.state.highlight} className='mx-2' /> {this.state.highlight ? 'on' : 'off'}
               </label>
               <div className="col">
-                <Button onClick={this.addPreviewItem} className='btn-sm'>&#10133; Add</Button>
+                <Button onClick={this.addPreviewItem} className='btn-sm mr-1'>&#10133; Add</Button>
                 <Button onClick={this.addChild} className='btn-sm' disabled={this.state.preview.id.toString().includes('-')}>&#10133; Child</Button>
               </div>
             </div>
@@ -288,7 +296,7 @@ class App extends Component<AppProps, AppState> {
                   <input type="text" name="cssId" id="cssId" className='input-text' value={this.state.preview.cssId} onChange={this.changeId} />
                 </div>
               </div>
-              <div className="row justify-center">
+              <div className="row mt-1 justify-center">
                 <div className="col label">
                   CSS Class:
                 </div>
@@ -296,7 +304,7 @@ class App extends Component<AppProps, AppState> {
                   <input type="text" name="classname" id="classname" className='input-text' value={this.state.preview.className} onChange={this.changeClass} />
                 </div>
               </div>
-              <ExportModal />
+              <ExportModal preview={this.state.preview} />
             </div>
           </aside>
         </main>

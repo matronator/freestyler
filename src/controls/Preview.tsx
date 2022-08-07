@@ -1,6 +1,7 @@
 import React, { Component, MouseEvent, ReactNode } from "react";
 import { Box } from "../properties/Box";
 import { Display } from "../properties/Display";
+import { FlexDirection } from "../properties/Flex";
 import { Position } from "../properties/Position";
 import { Border, BorderStyle } from "./../properties/Border";
 import { BoxShadow } from "./../properties/BoxShadow";
@@ -26,6 +27,7 @@ export interface Preview {
     element: PreviewElement;
     position: Position;
     display: Display;
+    flexDirection: FlexDirection;
     width: number;
     height: number;
     backgroundColor: string;
@@ -45,6 +47,7 @@ export function initPreview(id: number | string, isChild = false, element?: Prev
     element: element ?? PreviewElement.Div,
     position: Position.Relative,
     display: Display.Flex,
+    flexDirection: FlexDirection.Row,
     width: isChild ? 50 : 100,
     height: isChild ? 50 : 100,
     backgroundColor: isChild ? '#cecece' : '#bababa',
@@ -100,6 +103,8 @@ export class PreviewDiv extends Component<PreviewDivProps, PreviewDivState> {
 
   render(): ReactNode {
     const style = {
+      display: this.props.preview.display,
+      flexDirection: this.props.preview.flexDirection,
       width: `${this.props.preview.width}${this.props.preview.type === PreviewType.Child ? '%' : 'px'}`,
       height: `${this.props.preview.height}${this.props.preview.type === PreviewType.Child ? '%' : 'px'}`,
       border: `${this.props.preview.border.width}px ${this.props.preview.border.style} ${this.props.preview.border.color}`,

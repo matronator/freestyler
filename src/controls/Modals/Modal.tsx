@@ -29,7 +29,7 @@ export const Modal = (props: ModalProps) => {
                 {props.children}
             </div>
             {props.footer && <div className='modal-footer'>
-                <Button onClick={props.onClose}>Close</Button>
+                <Button onClick={props.onClose} className='btn-red'>Close</Button>
             </div>}
         </ReactModal>
     );

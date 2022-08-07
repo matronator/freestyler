@@ -13,7 +13,18 @@
 .w-20 { width: 20%; }
 .w-10 { width: 10%; }
 
+.mx-1 { margin-left: .25rem !important; margin-right: .25rem !important; }
+.mx-2 { margin-left: .5rem !important; margin-right: .5rem !important; }
 .mx-auto { margin-left: auto; margin-right: auto; }
 
-.mt-1 { margin-top: .25rem; }
-.mt-2 { margin-top: .5rem; }
+.mt-1 { margin-top: .25rem !important; }
+.mt-2 { margin-top: .5rem !important; }
+
+.mr-1 { margin-right: .25rem !important; }
+.mr-2 { margin-right: .5rem !important; }
+
+.mb-1 { margin-bottom: .25rem !important; }
+.mb-2 { margin-bottom: .5rem !important; }
+
+.ml-1 { margin-left: .25rem !important; }
+.ml-2 { margin-left: .5rem !important; }

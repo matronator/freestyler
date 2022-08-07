@@ -22,7 +22,7 @@ export const PopoverPicker = ({ color, onChange }) => {
             style={{ backgroundColor: color }}
             onClick={() => toggle(true)}
           />
-          <HexColorInput className='w-70' color={hexString} onChange={onChange} onClick={toggle} alpha prefixed />
+          <HexColorInput className='w-70 input-text' color={hexString} onChange={onChange} onClick={toggle} alpha prefixed />
       </div>
 
       {isOpen && (
