@@ -1,7 +1,7 @@
 import React, { Component, MouseEvent, ReactNode } from "react";
 import { Box } from "../properties/Box";
 import { Display } from "../properties/Display";
-import { FlexDirection } from "../properties/Flex";
+import { AlignItems, FlexDirection, JustifyContent } from "../properties/Flex";
 import { Position } from "../properties/Position";
 import { Border, BorderStyle } from "./../properties/Border";
 import { BoxShadow } from "./../properties/BoxShadow";
@@ -28,6 +28,8 @@ export interface Preview {
     position: Position;
     display: Display;
     flexDirection: FlexDirection;
+    justifyContent: JustifyContent;
+    alignItems: AlignItems;
     width: number;
     height: number;
     backgroundColor: string;
@@ -48,6 +50,8 @@ export function initPreview(id: number | string, isChild = false, element?: Prev
     position: Position.Relative,
     display: Display.Flex,
     flexDirection: FlexDirection.Row,
+    justifyContent: JustifyContent.Start,
+    alignItems: AlignItems.Start,
     width: isChild ? 50 : 100,
     height: isChild ? 50 : 100,
     backgroundColor: isChild ? '#cecece' : '#bababa',

@@ -1,4 +1,5 @@
 import { Component } from "react";
+import { Display } from "../../properties/Display";
 import { Button } from "../Button/Button";
 import { Preview, PreviewType } from "../Preview";
 import { Modal } from "./Modal";
@@ -39,8 +40,12 @@ export class ExportModal extends Component<ExportModalProps, ExportModalState> {
                     <p>Here's your CSS:</p>
                     <textarea name="singleCss" id="singleCss" className="exported-css" cols={30} rows={10}>
                         {this.props.preview && `#${this.props.preview.cssId} {
-    display: ${this.props.preview.display};
-    flex-direction: ${this.props.preview.flexDirection};
+    display: ${this.props.preview.display};${[Display.Flex, Display.Grid, Display.InlineFlex, Display.InlineGrid].includes(this.props.preview.display) ?
+    `
+    justify-content: ${this.props.preview.justifyContent};
+    align-items: ${this.props.preview.alignItems};`
+    : ''}${[Display.Flex, Display.InlineFlex].includes(this.props.preview.display) ? `
+    flex-direction: ${this.props.preview.flexDirection};` : ''}
     width: ${this.props.preview.width}${this.props.preview.type === PreviewType.Child ? '%' : 'px'};
     height: ${this.props.preview.height}${this.props.preview.type === PreviewType.Child ? '%' : 'px'};
     border: ${this.props.preview.border.width}px ${this.props.preview.border.style} ${this.props.preview.border.color};

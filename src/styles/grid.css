@@ -2,9 +2,14 @@
     display: flex;
     flex-direction: row;
 }
+.justify-end { justify-content: flex-end; }
 .justify-around { justify-content: space-around; }
 .justify-center { justify-content: center; }
+
 .align-middle { align-items: center; }
+
+.self-end { align-self: flex-end; }
+.justify-self-end { justify-self: flex-end; }
 
 .grid {
     display: grid;

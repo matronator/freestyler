@@ -16,7 +16,8 @@ import Switch from 'react-switch';
 import { ExportModal } from './controls/Modals/ExportModal';
 import { Button } from './controls/Button/Button';
 import ClipboardJS from 'clipboard';
-import { FlexDirection } from './properties/Flex';
+import { AlignItems, FlexDirection, JustifyContent } from './properties/Flex';
+import { ExportAllModal } from './controls/Modals/ExportAllModal';
 
 new ClipboardJS(`.btn`);
 
@@ -230,19 +231,27 @@ class App extends Component<AppProps, AppState> {
         <main>
           <nav className="property-list">
             <ul>
+              <li><div className='col-4 list-label'>Background:</div><div className='col-8 text-right w-100'><PopoverPicker color={this.state.preview.backgroundColor} onChange={(color: string) => this.setState({preview: {...this.state.preview, backgroundColor: color}, previewItems: this.state.previewItems, selectedId: this.state.selectedId})} /></div></li>
+              <li><InputSlider name="Width" title={this.state.preview.type === PreviewType.Child ? 'Width in %' : undefined} min={0} max={400} step={1} relative={this.state.preview.type === PreviewType.Child} onSliderChange={this.sliderChange} value={this.state.preview.width} /></li>
+              <li><InputSlider name="Height" title={this.state.preview.type === PreviewType.Child ? 'Height in %' : undefined} min={0} max={300} step={1} relative={this.state.preview.type === PreviewType.Child} onSliderChange={this.sliderChange} value={this.state.preview.height} /></li>
               <li>
                 <div className='col-6 list-label text-center'>Position:</div>
                 <div className='col-6 list-label text-center'>Display:</div>
                 <div className='col-6 text-center w-100'><SelectInput id='position' name='position' type='Position' items={Object.values(Position)} value={this.state.preview.position} onSelectChange={this.selectChange} /></div>
                 <div className='col-6 text-center w-100'><SelectInput id='display' name='display' items={Object.values(Display)} value={this.state.preview.display} onSelectChange={this.selectChange} /></div>
               </li>
-              {this.state.preview.display === Display.Flex && <li>
-                <div className='col-12 list-label text-center'>Flex direction:</div>
-                <div className='col-12 text-center w-100'><SelectInput id='flexDirection' name='flexDirection' items={Object.values(FlexDirection)} value={this.state.preview.flexDirection} onSelectChange={this.selectChange} /></div>
+              {[Display.Flex, Display.Grid, Display.InlineFlex, Display.InlineGrid].includes(this.state.preview.display) && <li>
+                {[Display.Flex, Display.InlineFlex].includes(this.state.preview.display) && (
+                  <>
+                    <div className='col-12 list-label text-center'>Flex direction:</div>
+                    <div className='col-12 text-center w-100 mb-2'><SelectInput id='flexDirection' name='flexDirection' items={Object.values(FlexDirection)} value={this.state.preview.flexDirection} onSelectChange={this.selectChange} /></div>
+                  </>
+                )}
+                <div className='col-6 list-label text-center'>Justify content:</div>
+                <div className='col-6 list-label text-center'>Align items:</div>
+                <div className='col-6 text-center w-100'><SelectInput id='justifyContent' name='justifyContent' items={Object.values(JustifyContent)} value={this.state.preview.justifyContent} onSelectChange={this.selectChange} /></div>
+                <div className='col-6 text-center w-100'><SelectInput id='alignItems' name='alignItems' items={Object.values(AlignItems)} value={this.state.preview.alignItems} onSelectChange={this.selectChange} /></div>
               </li>}
-              <li><InputSlider name="Width" title={this.state.preview.type === PreviewType.Child ? 'Width in %' : undefined} min={0} max={400} step={1} relative={this.state.preview.type === PreviewType.Child} onSliderChange={this.sliderChange} value={this.state.preview.width} /></li>
-              <li><InputSlider name="Height" title={this.state.preview.type === PreviewType.Child ? 'Height in %' : undefined} min={0} max={300} step={1} relative={this.state.preview.type === PreviewType.Child} onSliderChange={this.sliderChange} value={this.state.preview.height} /></li>
-              <li><div className='col-4 list-label'>Background:</div><div className='col-8 text-right w-100'><PopoverPicker color={this.state.preview.backgroundColor} onChange={(color: string) => this.setState({preview: {...this.state.preview, backgroundColor: color}, previewItems: this.state.previewItems, selectedId: this.state.selectedId})} /></div></li>
               <li><BorderControl
                   color={this.state.preview.border.color}
                   selectValue={this.state.preview.border.style}
@@ -278,7 +287,7 @@ class App extends Component<AppProps, AppState> {
           </div>
 
           <aside className="tools">
-            <div className="tools-global">
+            <div className="tools-global mb-auto">
               <label className="label row align-middle">
                 Highlight selected <Switch onChange={this.toggleHighlight} checked={this.state.highlight} className='mx-2' /> {this.state.highlight ? 'on' : 'off'}
               </label>
@@ -306,6 +315,7 @@ class App extends Component<AppProps, AppState> {
               </div>
               <ExportModal preview={this.state.preview} />
             </div>
+            <div className="text-right mt-auto"><ExportAllModal previewItems={this.state.previewItems} /></div>
           </aside>
         </main>
       </div>

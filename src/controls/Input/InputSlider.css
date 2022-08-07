@@ -85,6 +85,7 @@ input.input-slider[type=range]::-ms-thumb {
 input.input-slider[type=range]::-webkit-slider-runnable-track {
     width: 100%;
     height: 6px;
+    margin-top: -12px;
     cursor: ew-resize;
     box-shadow: inset 1px 1.5px 1px rgba(0,0,0,.65), 0 -1px 2px -1px rgba(0,0,0,.35);
     background-image: linear-gradient(90deg, #8899aa, #99aabb);
@@ -101,6 +102,7 @@ input.input-slider[type=range]:focus::-webkit-slider-runnable-track {
 input.input-slider[type=range]::-moz-range-track {
     width: 100%;
     height: 6px;
+    margin-top: -12px;
     cursor: ew-resize;
     box-shadow: inset 1px 1.5px 1px rgba(0,0,0,.65), 0 -1px 2px -1px rgba(0,0,0,.35);
     background-image: linear-gradient(90deg, #8899aa, #99aabb);

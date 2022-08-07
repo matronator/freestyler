@@ -59,7 +59,7 @@ main {
     padding-inline-start: 0;
     > li {
       position: relative;
-      margin-bottom: .5rem;
+      margin-bottom: .75rem;
       padding-bottom: .5rem;
       display: grid;
       grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
@@ -88,12 +88,15 @@ main {
 .tools {
   grid-area: t;
   background-color: #c0c0c0;
+  display: grid;
+  align-items: stretch;
+  justify-content: stretch;
+  padding: .5rem;
 
   .tools-global {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: .5rem;
   }
 }
 
