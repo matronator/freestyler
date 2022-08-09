@@ -12,9 +12,9 @@ export enum PreviewType {
 }
 export enum PreviewElement {
   Div = 'div',
-  Paragraph = 'paragraph',
-  Heading = 'heading',
-  Subheading = 'subheading',
+  Paragraph = 'p',
+  Heading = 'h2',
+  Subheading = 'h3',
 }
 
 export interface Preview {
@@ -23,6 +23,7 @@ export interface Preview {
     cssId: string;
     className: string;
     children?: Preview[] | null;
+    content?: string;
     type: PreviewType;
     element: PreviewElement;
     position: Position;
@@ -43,8 +44,9 @@ export interface Preview {
 export function initPreview(id: number | string, isChild = false, element?: PreviewElement): Preview {
   return {
     id: id,
-    cssId: `div${id}`,
+    cssId: `${element ? element.toLowerCase() : 'div'}-${id}`,
     className: 'div',
+    content: isChild ? (element ? element.toLowerCase() : 'div') : undefined,
     children: null,
     type: isChild ? PreviewType.Child : PreviewType.Parent,
     element: element ?? PreviewElement.Div,
@@ -127,21 +129,21 @@ export class PreviewDiv extends Component<PreviewDivProps, PreviewDivState> {
     switch(this.props.preview.element) {
       case PreviewElement.Paragraph:
         return (
-          <p style={style} className={this.props.selected ? 'preview-item selected' : 'preview-item'} onClick={this.handleClick}>{this.props.children}</p>
+          <p style={style} className={this.props.selected ? 'preview-item selected' : 'preview-item'} onClick={this.handleClick}>{this.props.preview.type === PreviewType.Parent ? this.props.children : this.props.preview.content}</p>
         );
       case PreviewElement.Heading:
         return (
-          <h2 style={style} className={this.props.selected ? 'preview-item selected' : 'preview-item'} onClick={this.handleClick}>{this.props.children}</h2>
+          <h2 style={style} className={this.props.selected ? 'preview-item selected' : 'preview-item'} onClick={this.handleClick}>{this.props.preview.type === PreviewType.Parent ? this.props.children : this.props.preview.content}</h2>
         );
       case PreviewElement.Subheading:
         return (
-          <h3 style={style} className={this.props.selected ? 'preview-item selected' : 'preview-item'} onClick={this.handleClick}>{this.props.children}</h3>
+          <h3 style={style} className={this.props.selected ? 'preview-item selected' : 'preview-item'} onClick={this.handleClick}>{this.props.preview.type === PreviewType.Parent ? this.props.children : this.props.preview.content}</h3>
         );
       case PreviewElement.Div:
       default:
         return (
           <div style={style} className={this.props.selected ? 'preview-item selected' : 'preview-item'} data-id-id={this.props.id} onClick={this.handleClick}>
-            {this.props.children}
+            {this.props.preview.type === PreviewType.Parent ? this.props.children : this.props.preview.content}
           </div>
         );
     }

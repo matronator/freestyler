@@ -4,7 +4,7 @@ import './styles/grid.css';
 import './styles/form.css';
 import './styles/utils.css';
 import React, { ChangeEvent, Component } from 'react';
-import { Preview, initPreview, PreviewType } from './controls/Preview';
+import { Preview, initPreview, PreviewType, PreviewElement } from './controls/Preview';
 import { InputSlider } from './controls/Input/InputSlider';
 import { BorderControl } from './controls/Input/BorderControl';
 import { PopoverPicker } from './controls/Input/PopoverPicker';
@@ -18,6 +18,7 @@ import { Button } from './controls/Button/Button';
 import ClipboardJS from 'clipboard';
 import { AlignItems, FlexDirection, JustifyContent } from './properties/Flex';
 import { ExportAllModal } from './controls/Modals/ExportAllModal';
+import { ButtonGroup } from './controls/Button/ButtonGroup';
 
 new ClipboardJS(`.btn`);
 
@@ -30,13 +31,15 @@ interface AppState {
   previewItems: PreviewItem[];
   selectedId: number | string;
   highlight: boolean;
+  childType: PreviewElement;
 }
 
 class App extends Component<AppProps, AppState> {
   constructor(props: AppProps) {
     super(props);
     const newPreview = initPreview(0);
-    this.state = {preview: newPreview, previewItems: [{ id: 0, preview: newPreview, selected: true, isParent: true, children: null }], selectedId: 0, highlight: true };
+    this.state = {preview: newPreview, previewItems: [{ id: 0, preview: newPreview, selected: true, isParent: true, children: null }], selectedId: 0, highlight: true, childType: PreviewElement.Div };
+    this.setChildType = this.setChildType.bind(this);
     this.changeClass = this.changeClass.bind(this);
     this.changeId = this.changeId.bind(this);
     this.toggleHighlight = this.toggleHighlight.bind(this);
@@ -45,6 +48,15 @@ class App extends Component<AppProps, AppState> {
     this.addPreviewItem = this.addPreviewItem.bind(this);
     this.addChild = this.addChild.bind(this);
     this.selectItem = this.selectItem.bind(this);
+  }
+
+  setChildType(e: ChangeEvent<HTMLInputElement>) {
+    this.setState(prevState => (
+      {
+        ...prevState,
+        childType: (e.target.value) as PreviewElement,
+      }
+    ));
   }
 
   changeClass(e: ChangeEvent<HTMLInputElement>) {
@@ -138,7 +150,7 @@ class App extends Component<AppProps, AppState> {
     const id = `${this.state.selectedId}-${(this.state.preview.children && this.state.preview.children?.length > 0) ? this.state.preview.children?.length : 0}`;
     const newItem: PreviewItem = {
       id: id,
-      preview: initPreview(id, true),
+      preview: initPreview(id, true, this.state.childType),
       selected: true,
       children: null,
       isParent: false,
@@ -312,6 +324,7 @@ class App extends Component<AppProps, AppState> {
               <div className="col">
                 <Button onClick={this.addPreviewItem} className='btn-sm mr-1'>&#10133; Add</Button>
                 <Button onClick={this.addChild} className='btn-sm' disabled={this.state.preview.id.toString().includes('-')}>&#10133; Child</Button>
+                <ButtonGroup name='childType' className='btn-sm' value={PreviewElement.Div} onChange={this.setChildType} items={[{label: 'Div', value: PreviewElement.Div}, {label: 'P', value: PreviewElement.Paragraph}, {label: 'H2', value: PreviewElement.Heading}, {label: 'H3', value: PreviewElement.Subheading}]} />
               </div>
             </div>
             <div className="tools-element">
@@ -321,14 +334,6 @@ class App extends Component<AppProps, AppState> {
                 </div>
                 <div className="col">
                   <input type="text" name="cssId" id="cssId" className='input-text' value={this.state.preview.cssId} onChange={this.changeId} />
-                </div>
-              </div>
-              <div className="row mt-1 justify-center">
-                <div className="col label">
-                  CSS Class:
-                </div>
-                <div className="col">
-                  <input type="text" name="classname" id="classname" className='input-text' value={this.state.preview.className} onChange={this.changeClass} />
                 </div>
               </div>
               <ExportModal preview={this.state.preview} />
