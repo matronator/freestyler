@@ -46,7 +46,7 @@ export function initPreview(id: number | string, isChild = false, element?: Prev
     id: id,
     cssId: `${element ? element.toLowerCase() : 'div'}-${id}`,
     className: 'div',
-    content: isChild ? (element ? element.toLowerCase() : 'div') : undefined,
+    content: isChild ? (element ? elementToContent(element) : 'div') : undefined,
     children: null,
     type: isChild ? PreviewType.Child : PreviewType.Parent,
     element: element ?? PreviewElement.Div,
@@ -56,8 +56,8 @@ export function initPreview(id: number | string, isChild = false, element?: Prev
     justifyContent: JustifyContent.FlexStart,
     alignItems: AlignItems.FlexStart,
     gridColumns: 4,
-    width: isChild ? 50 : 100,
-    height: isChild ? 50 : 100,
+    width: isChild ? 50 : 320,
+    height: isChild ? 50 : 240,
     backgroundColor: isChild ? '#cecece' : '#bababa',
     border: {
       width: 0,
@@ -143,9 +143,22 @@ export class PreviewDiv extends Component<PreviewDivProps, PreviewDivState> {
       default:
         return (
           <div style={style} className={this.props.selected ? 'preview-item selected' : 'preview-item'} data-id-id={this.props.id} onClick={this.handleClick}>
-            {this.props.preview.type === PreviewType.Parent ? this.props.children : this.props.preview.content}
+            {this.props.children}
           </div>
         );
     }
+  }
+}
+
+const elementToContent = (el: PreviewElement): string => {
+  switch(el) {
+    case PreviewElement.Div:
+      return 'Div';
+    case PreviewElement.Heading:
+      return 'Heading';
+    case PreviewElement.Paragraph:
+      return 'Paragraph';
+    case PreviewElement.Subheading:
+      return 'Subheading';
   }
 }

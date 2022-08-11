@@ -40,7 +40,7 @@ class App extends Component<AppProps, AppState> {
     const newPreview = initPreview(0);
     this.state = {preview: newPreview, previewItems: [{ id: 0, preview: newPreview, selected: true, isParent: true, children: null }], selectedId: 0, highlight: true, childType: PreviewElement.Div };
     this.setChildType = this.setChildType.bind(this);
-    this.changeClass = this.changeClass.bind(this);
+    this.changeContent = this.changeContent.bind(this);
     this.changeId = this.changeId.bind(this);
     this.toggleHighlight = this.toggleHighlight.bind(this);
     this.sliderChange = this.sliderChange.bind(this);
@@ -59,13 +59,13 @@ class App extends Component<AppProps, AppState> {
     ));
   }
 
-  changeClass(e: ChangeEvent<HTMLInputElement>) {
+  changeContent(e: ChangeEvent<HTMLTextAreaElement>) {
     this.setState(prevState => (
       {
         ...prevState,
         preview: {
           ...prevState.preview,
-          className: e.target.value,
+          content: e.target.value,
         }
       }
     ));
@@ -204,7 +204,7 @@ class App extends Component<AppProps, AppState> {
   selectItem(id: number | string) {
     const selectedItem = typeof id === 'number' ? this.state.previewItems.find(item => item.id === id) :
       this.state.previewItems.find(item => item.id.toString() === id.substring(0, id.indexOf('-')))?.children?.find(child => child.id === id);
-    if (selectedItem) {
+    if (selectedItem && selectedItem.id !== this.state.selectedId) {
       selectedItem.selected = true;
       this.setState(prevState => ({
         preview: selectedItem.preview,
@@ -244,8 +244,8 @@ class App extends Component<AppProps, AppState> {
           <nav className="property-list">
             <ul>
               <li><div className='col-4 list-label'>Background:</div><div className='col-8 text-right w-100'><PopoverPicker color={this.state.preview.backgroundColor} onChange={(color: string) => this.setState({preview: {...this.state.preview, backgroundColor: color}, previewItems: this.state.previewItems, selectedId: this.state.selectedId})} /></div></li>
-              <li><InputSlider name="Width" title={this.state.preview.type === PreviewType.Child ? 'Width in %' : undefined} min={0} max={400} step={1} relative={this.state.preview.type === PreviewType.Child} onSliderChange={this.sliderChange} value={this.state.preview.width} /></li>
-              <li><InputSlider name="Height" title={this.state.preview.type === PreviewType.Child ? 'Height in %' : undefined} min={0} max={300} step={1} relative={this.state.preview.type === PreviewType.Child} onSliderChange={this.sliderChange} value={this.state.preview.height} /></li>
+              <li><InputSlider name="Width" title={this.state.preview.type === PreviewType.Child ? 'Width in %' : undefined} min={0} max={640} step={1} relative={this.state.preview.type === PreviewType.Child} onSliderChange={this.sliderChange} value={this.state.preview.width} /></li>
+              <li><InputSlider name="Height" title={this.state.preview.type === PreviewType.Child ? 'Height in %' : undefined} min={0} max={480} step={1} relative={this.state.preview.type === PreviewType.Child} onSliderChange={this.sliderChange} value={this.state.preview.height} /></li>
               <li>
                 <div className='col-6 list-label text-center'>Position:</div>
                 <div className='col-6 list-label text-center'>Display:</div>
@@ -321,24 +321,40 @@ class App extends Component<AppProps, AppState> {
                 />
                 {this.state.highlight ? 'on' : 'off'}
               </label>
-              <div className="col">
+              <div className="row">
                 <Button onClick={this.addPreviewItem} className='btn-sm mr-1'>&#10133; Add</Button>
-                <Button onClick={this.addChild} className='btn-sm' disabled={this.state.preview.id.toString().includes('-')}>&#10133; Child</Button>
-                <ButtonGroup name='childType' className='btn-sm' value={PreviewElement.Div} onChange={this.setChildType} items={[{label: 'Div', value: PreviewElement.Div}, {label: 'P', value: PreviewElement.Paragraph}, {label: 'H2', value: PreviewElement.Heading}, {label: 'H3', value: PreviewElement.Subheading}]} />
+                <Button onClick={this.addChild} className='btn-sm btn-group-start' disabled={this.state.preview.id.toString().includes('-')}>&#10133; Child</Button>
+                <ButtonGroup name='childType' className='btn-sm' wrapperClass='btn-group-end' value={PreviewElement.Div} onChange={this.setChildType} items={[{label: 'Div', value: PreviewElement.Div}, {label: 'P', value: PreviewElement.Paragraph}, {label: 'H2', value: PreviewElement.Heading}, {label: 'H3', value: PreviewElement.Subheading}]} />
               </div>
             </div>
-            <div className="tools-element">
-              <div className="row justify-center">
-                <div className="col label">
-                  Element ID:
-                </div>
-                <div className="col">
-                  <input type="text" name="cssId" id="cssId" className='input-text' value={this.state.preview.cssId} onChange={this.changeId} />
+            <div className="grid">
+              <div className="col-6 row justify-between">
+                <div className="grid">
+                  <div className="col-4 label text-right">
+                    Element ID:
+                  </div>
+                  <div className="col-6">
+                    <input type="text" name="cssId" id="cssId" className='input-text' value={this.state.preview.cssId} onChange={this.changeId} />
+                  </div>
+                  <div className="col-12 row justify-center">
+                    {[PreviewElement.Heading, PreviewElement.Paragraph, PreviewElement.Subheading].includes(this.state.preview.element) && (
+                      <>
+                        <div className="col label">
+                          Text:
+                        </div>
+                        <div className="col">
+                          <textarea name="contentText" id="contentText" cols={20} rows={4} className='input-text no-resize' value={this.state.preview.content} onChange={this.changeContent} />
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
-              <ExportModal preview={this.state.preview} />
+              <div className="col-6 text-right mt-auto">
+                <ExportModal preview={this.state.preview} className='mr-2' />
+                <ExportAllModal previewItems={this.state.previewItems} />
+              </div>
             </div>
-            <div className="text-right mt-auto"><ExportAllModal previewItems={this.state.previewItems} /></div>
           </aside>
         </main>
       </div>

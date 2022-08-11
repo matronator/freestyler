@@ -13,13 +13,13 @@
 main {
   width: 1024px;
   min-height: 480px;
-  max-height: 600px;
+  max-height: 680px;
   margin: 0 auto;
   display: grid;
   grid-template-areas:
   "l p"
   "l t";
-  grid-template-rows: 2fr 1fr;
+  grid-template-rows: 2fr .75fr;
   grid-template-columns: 1fr 3fr;
 }
 

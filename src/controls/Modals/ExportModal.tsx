@@ -6,6 +6,7 @@ import { Modal } from "./Modal";
 
 interface ExportModalProps {
     preview: Preview;
+    className?: string;
 }
 
 interface ExportModalState {
@@ -35,7 +36,7 @@ export class ExportModal extends Component<ExportModalProps, ExportModalState> {
     render() {
         return (
             <>
-                <Button onClick={this.toggleModal}>Export CSS</Button>
+                <Button onClick={this.toggleModal} className={this.props.className}>Export CSS</Button>
                 <Modal isOpen={this.state.open} contentLabel='Export CSS modal' title='Export CSS' footer onClose={this.closeModal}>
                     <p>Here's your CSS:</p>
                     <textarea name="singleCss" id="singleCss" className="exported-css" cols={30} rows={10}>

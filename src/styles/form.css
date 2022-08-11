@@ -21,3 +21,7 @@
 .exported-css {
     font-family: 'Menlo', monospace;
 }
+
+textarea.no-resize {
+    resize: none;
+}

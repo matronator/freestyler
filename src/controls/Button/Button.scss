@@ -27,6 +27,13 @@
         font-size: .75rem;
     }
 
+    &.btn-grey {
+        background-image: linear-gradient(#cacaca 25%, #bdbdbd 80%, #9c9c9c 100%);
+        border-color: #7f7f7f;
+        &:active {
+            background-image: linear-gradient(#9c9c9c 0%, #bdbdbd 25%, #cacaca 90%);
+        }
+    }
     &.btn-dark {
         color: #fff;
         background-image: linear-gradient(#2d2d2d 25%, #191919 80%, #0d0d0d 100%);
@@ -37,10 +44,10 @@
     }
     &.btn-blue {
         color: #fff;
-        background-image: linear-gradient(#0776a9 25%, #045680 80%, #002d48 100%);
+        background-image: linear-gradient(#0776a9 25%, #045680 80%, #083a58 100%);
         border-color: #08273b;
         &:active {
-            background-image: linear-gradient(#002d48 0%, #045680 25%, #0776a9 90%);
+            background-image: linear-gradient(#083a58 0%, #045680 25%, #0776a9 90%);
         }
     }
     &.btn-green {
@@ -67,7 +74,43 @@
         clip: rect(0,0,0,0);
         pointer-events: none;
     }
-    .btn.active {
-        background-image: linear-gradient(#cbcbcb 0%, #e2e2e2 25%, #f4f4f4 90%);
+    .btn {
+        &:first-of-type {
+            border-right-width: .5px;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        &:not(:first-of-type):not(:last-of-type) {
+            border-left: none;
+            border-right-width: .5px;
+            border-radius: 0;
+        }
+        &:last-of-type {
+            border-left: none;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
+        &.active {
+            background-image: linear-gradient(#cbcbcb 0%, #e2e2e2 25%, #f4f4f4 90%);
+            &.btn-grey { background-image: linear-gradient(#9c9c9c 0%, #bdbdbd 25%, #cacaca 90%); }
+            &.btn-dark { background-image: linear-gradient(#0d0d0d 0%, #191919 25%, #2d2d2d 90%); }
+            &.btn-blue { background-image: linear-gradient(#083a58 0%, #045680 25%, #0776a9 90%); }
+            &.btn-green { background-image: linear-gradient(#005406 0%, #22782f 25%, #13aa08 90%); }
+            &.btn-red { background-image: linear-gradient(#570f0f 0%, #840f0f 25%, #ac2121 90%); }
+        }
+    }
+}
+
+.btn.btn-group-start {
+    border-right-width: .5px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.btn-group.btn-group-end {
+    .btn:first-of-type {
+        border-left: none;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
     }
 }
