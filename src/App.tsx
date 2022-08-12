@@ -284,6 +284,14 @@ class App extends Component<AppProps, AppState> {
                 <InputSlider name="BoxShadow" property="spread" title="Shadow Spread" value={this.state.preview.boxShadow.spread} min={-100} max={100} step={1} onSliderChange={this.sliderChange} />
                 <div className='col-4 list-label'>Shadow Color:</div><div className='col-8 text-right w-100'><PopoverPicker color={this.state.preview.boxShadow.color} onChange={(color: string) => this.setState({preview: {...this.state.preview, boxShadow: {...this.state.preview.boxShadow, color: color}}, previewItems: this.state.previewItems, selectedId: this.state.selectedId})} /></div>
               </li>
+              {[PreviewElement.Heading, PreviewElement.Paragraph, PreviewElement.Subheading].includes(this.state.preview.element) && (
+                <li>
+                  <InputSlider name="TextShadow" property="x" title="Shadow X" value={this.state.preview.textShadow.x} min={-100} max={100} step={1} onSliderChange={this.sliderChange} />
+                  <InputSlider name="TextShadow" property="y" title="Shadow Y" value={this.state.preview.textShadow.y} min={-100} max={100} step={1} onSliderChange={this.sliderChange} />
+                  <InputSlider name="TextShadow" property="blur" title="Shadow Blur" value={this.state.preview.textShadow.blur} min={0} max={100} step={1} onSliderChange={this.sliderChange} />
+                  <div className='col-4 list-label'>Shadow Color:</div><div className='col-8 text-right w-100'><PopoverPicker color={this.state.preview.textShadow.color} onChange={(color: string) => this.setState({preview: {...this.state.preview, textShadow: {...this.state.preview.textShadow, color: color}}, previewItems: this.state.previewItems, selectedId: this.state.selectedId})} /></div>
+                </li>
+              )}
               <li>
                 <InputSlider name="Margin" property="top" title="Margin Top" value={this.state.preview.margin.top} min={-100} max={200} step={1} onSliderChange={this.sliderChange} />
                 <InputSlider name="Margin" property="right" title="Margin Right" value={this.state.preview.margin.right} min={-100} max={200} step={1} onSliderChange={this.sliderChange} />

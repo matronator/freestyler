@@ -3,6 +3,7 @@ import { Box } from "../properties/Box";
 import { Display } from "../properties/Display";
 import { AlignItems, FlexDirection, JustifyContent } from "../properties/Flex";
 import { Position } from "../properties/Position";
+import { TextShadow } from "../properties/TextShadow";
 import { Border, BorderStyle } from "./../properties/Border";
 import { BoxShadow } from "./../properties/BoxShadow";
 
@@ -37,6 +38,7 @@ export interface Preview {
     backgroundColor: string;
     border: Border;
     boxShadow: BoxShadow;
+    textShadow: TextShadow;
     margin: Box;
     padding: Box;
 }
@@ -70,6 +72,12 @@ export function initPreview(id: number | string, isChild = false, element?: Prev
       y: 0,
       blur: 0,
       spread: 0,
+      color: '#000000',
+    },
+    textShadow: {
+      x: 0,
+      y: 0,
+      blur: 0,
       color: '#000000',
     },
     margin: {
@@ -122,6 +130,7 @@ export class PreviewDiv extends Component<PreviewDivProps, PreviewDivState> {
       borderRadius: `${this.props.preview.border.radius}px`,
       backgroundColor: this.props.preview.backgroundColor,
       boxShadow: `${this.props.preview.boxShadow.x}px ${this.props.preview.boxShadow.y}px ${this.props.preview.boxShadow.blur}px ${this.props.preview.boxShadow.spread}px ${this.props.preview.boxShadow.color}`,
+      textShadow: `${this.props.preview.textShadow.x}px ${this.props.preview.textShadow.y}px ${this.props.preview.textShadow.blur}px ${this.props.preview.textShadow.color}`,
       margin: `${this.props.preview.margin.top}px ${this.props.preview.margin.right}px ${this.props.preview.margin.bottom}px ${this.props.preview.margin.left}px`,
       padding: `${this.props.preview.padding.top}px ${this.props.preview.padding.right}px ${this.props.preview.padding.bottom}px ${this.props.preview.padding.left}px`,
     };
