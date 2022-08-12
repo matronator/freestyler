@@ -19,6 +19,7 @@ import ClipboardJS from 'clipboard';
 import { AlignItems, FlexDirection, JustifyContent } from './properties/Flex';
 import { ExportAllModal } from './controls/Modals/ExportAllModal';
 import { ButtonGroup } from './controls/Button/ButtonGroup';
+import { ShadowControl } from './controls/InputGroups/ShadowControl';
 
 new ClipboardJS(`.btn`);
 
@@ -269,27 +270,36 @@ class App extends Component<AppProps, AppState> {
                 <div className='col-6 text-center w-100'><SelectInput id='justifyContent' name='justifyContent' items={Object.values(JustifyContent)} value={this.state.preview.justifyContent} onSelectChange={this.selectChange} /></div>
                 <div className='col-6 text-center w-100'><SelectInput id='alignItems' name='alignItems' items={Object.values(AlignItems)} value={this.state.preview.alignItems} onSelectChange={this.selectChange} /></div>
               </li>}
-              <li><BorderControl
+              <li>
+                <BorderControl
                   color={this.state.preview.border.color}
                   selectValue={this.state.preview.border.style}
                   onPickerChange={(color: string) => this.setState({preview: {...this.state.preview, border: {...this.state.preview.border, color: color}}})}
                   onSelectChange={this.selectChange}
-                  sliderProps={{ min: 0, max: 100, step: 1, value: this.state.preview.border.width, property: 'width', name: 'Border', onSliderChange: this.sliderChange }} />
+                  sliderProps={{ min: 0, max: 100, step: 1, value: this.state.preview.border.width, property: 'width', name: 'Border', onSliderChange: this.sliderChange }}
+                />
               </li>
               <li><InputSlider name="Border" property="radius" title="Border radius" value={this.state.preview.border.radius} min={0} max={200} step={1} onSliderChange={this.sliderChange} /></li>
               <li>
-                <InputSlider name="BoxShadow" property="x" title="Shadow X" value={this.state.preview.boxShadow.x} min={-100} max={100} step={1} onSliderChange={this.sliderChange} />
-                <InputSlider name="BoxShadow" property="y" title="Shadow Y" value={this.state.preview.boxShadow.y} min={-100} max={100} step={1} onSliderChange={this.sliderChange} />
-                <InputSlider name="BoxShadow" property="blur" title="Shadow Blur" value={this.state.preview.boxShadow.blur} min={0} max={100} step={1} onSliderChange={this.sliderChange} />
-                <InputSlider name="BoxShadow" property="spread" title="Shadow Spread" value={this.state.preview.boxShadow.spread} min={-100} max={100} step={1} onSliderChange={this.sliderChange} />
-                <div className='col-4 list-label'>Shadow Color:</div><div className='col-8 text-right w-100'><PopoverPicker color={this.state.preview.boxShadow.color} onChange={(color: string) => this.setState({preview: {...this.state.preview, boxShadow: {...this.state.preview.boxShadow, color: color}}, previewItems: this.state.previewItems, selectedId: this.state.selectedId})} /></div>
+                <ShadowControl
+                  offsetX={{ min: -100, max: 100, step: 1, name: 'BoxShadow', property: 'x', title: 'Shadow X', value: this.state.preview.boxShadow.x, onSliderChange: this.sliderChange }}
+                  offsetY={{ min: -100, max: 100, step: 1, name: 'BoxShadow', property: 'y', title: 'Shadow Y', value: this.state.preview.boxShadow.y, onSliderChange: this.sliderChange }}
+                  blur={{ min: 0, max: 100, step: 1, name: 'BoxShadow', property: 'blur', title: 'Shadow Blur', value: this.state.preview.boxShadow.blur, onSliderChange: this.sliderChange }}
+                  color={this.state.preview.boxShadow.color}
+                  colorLabel='Shadow Color:'
+                  onColorChange={(color: string) => this.setState({preview: {...this.state.preview, boxShadow: {...this.state.preview.boxShadow, color: color}}, previewItems: this.state.previewItems, selectedId: this.state.selectedId})}
+                />
               </li>
               {[PreviewElement.Heading, PreviewElement.Paragraph, PreviewElement.Subheading].includes(this.state.preview.element) && (
                 <li>
-                  <InputSlider name="TextShadow" property="x" title="Shadow X" value={this.state.preview.textShadow.x} min={-100} max={100} step={1} onSliderChange={this.sliderChange} />
-                  <InputSlider name="TextShadow" property="y" title="Shadow Y" value={this.state.preview.textShadow.y} min={-100} max={100} step={1} onSliderChange={this.sliderChange} />
-                  <InputSlider name="TextShadow" property="blur" title="Shadow Blur" value={this.state.preview.textShadow.blur} min={0} max={100} step={1} onSliderChange={this.sliderChange} />
-                  <div className='col-4 list-label'>Shadow Color:</div><div className='col-8 text-right w-100'><PopoverPicker color={this.state.preview.textShadow.color} onChange={(color: string) => this.setState({preview: {...this.state.preview, textShadow: {...this.state.preview.textShadow, color: color}}, previewItems: this.state.previewItems, selectedId: this.state.selectedId})} /></div>
+                  <ShadowControl
+                    offsetX={{ min: -100, max: 100, step: 1, name: 'TextShadow', property: 'x', title: 'Text Shadow X', value: this.state.preview.textShadow.x, onSliderChange: this.sliderChange }}
+                    offsetY={{ min: -100, max: 100, step: 1, name: 'TextShadow', property: 'y', title: 'Text Shadow Y', value: this.state.preview.textShadow.y, onSliderChange: this.sliderChange }}
+                    blur={{ min: 0, max: 100, step: 1, name: 'TextShadow', property: 'blur', title: 'Text Shadow Blur', value: this.state.preview.textShadow.blur, onSliderChange: this.sliderChange }}
+                    color={this.state.preview.textShadow.color}
+                    colorLabel='Text Shadow Color:'
+                    onColorChange={(color: string) => this.setState({preview: {...this.state.preview, textShadow: {...this.state.preview.textShadow, color: color}}, previewItems: this.state.previewItems, selectedId: this.state.selectedId})}
+                  />
                 </li>
               )}
               <li>
