@@ -49,6 +49,6 @@
   "devDependencies": {
     "@types/react-modal": "^3.13.1",
     "autoprefixer": "^10.4.7",
-    "postcss": "^8.4.49"
+    "postcss": "^8.5.0"
   }
 }
