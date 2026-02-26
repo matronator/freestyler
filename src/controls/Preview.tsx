@@ -73,6 +73,7 @@ export function initPreview(id: number | string, isChild = false, element?: Prev
       blur: 0,
       spread: 0,
       color: '#000000',
+      inset: false,
     },
     textShadow: {
       x: 0,
@@ -112,7 +113,7 @@ export class PreviewDiv extends Component<PreviewDivProps, PreviewDivState> {
     this.handleClick = this.handleClick.bind(this);
   }
 
-  handleClick(event: MouseEvent<HTMLElement>) {
+  handleClick(id: number | string, event: MouseEvent<HTMLDivElement>) {
     event.stopPropagation();
     this.props.onClick(this.props.id);
   }
@@ -129,7 +130,7 @@ export class PreviewDiv extends Component<PreviewDivProps, PreviewDivState> {
       border: `${this.props.preview.border.width}px ${this.props.preview.border.style} ${this.props.preview.border.color}`,
       borderRadius: `${this.props.preview.border.radius}px`,
       backgroundColor: this.props.preview.backgroundColor,
-      boxShadow: `${this.props.preview.boxShadow.x}px ${this.props.preview.boxShadow.y}px ${this.props.preview.boxShadow.blur}px ${this.props.preview.boxShadow.spread}px ${this.props.preview.boxShadow.color}`,
+      boxShadow: `${this.props.preview.boxShadow.inset ? 'inset ' : ''}${this.props.preview.boxShadow.x}px ${this.props.preview.boxShadow.y}px ${this.props.preview.boxShadow.blur}px ${this.props.preview.boxShadow.spread}px ${this.props.preview.boxShadow.color}`,
       textShadow: `${this.props.preview.textShadow.x}px ${this.props.preview.textShadow.y}px ${this.props.preview.textShadow.blur}px ${this.props.preview.textShadow.color}`,
       margin: `${this.props.preview.margin.top}px ${this.props.preview.margin.right}px ${this.props.preview.margin.bottom}px ${this.props.preview.margin.left}px`,
       padding: `${this.props.preview.padding.top}px ${this.props.preview.padding.right}px ${this.props.preview.padding.bottom}px ${this.props.preview.padding.left}px`,
@@ -138,20 +139,20 @@ export class PreviewDiv extends Component<PreviewDivProps, PreviewDivState> {
     switch(this.props.preview.element) {
       case PreviewElement.Paragraph:
         return (
-          <p style={style} className={this.props.selected ? 'preview-item selected' : 'preview-item'} onClick={this.handleClick}>{this.props.preview.type === PreviewType.Parent ? this.props.children : this.props.preview.content}</p>
+          <p style={style} className={this.props.selected ? 'preview-item selected' : 'preview-item'} onClick={(event) => { this.handleClick(this.props.id, event) }}>{this.props.preview.type === PreviewType.Parent ? this.props.children : this.props.preview.content}</p>
         );
       case PreviewElement.Heading:
         return (
-          <h2 style={style} className={this.props.selected ? 'preview-item selected' : 'preview-item'} onClick={this.handleClick}>{this.props.preview.type === PreviewType.Parent ? this.props.children : this.props.preview.content}</h2>
+          <h2 style={style} className={this.props.selected ? 'preview-item selected' : 'preview-item'} onClick={(event) => { this.handleClick(this.props.id, event) }}>{this.props.preview.type === PreviewType.Parent ? this.props.children : this.props.preview.content}</h2>
         );
       case PreviewElement.Subheading:
         return (
-          <h3 style={style} className={this.props.selected ? 'preview-item selected' : 'preview-item'} onClick={this.handleClick}>{this.props.preview.type === PreviewType.Parent ? this.props.children : this.props.preview.content}</h3>
+          <h3 style={style} className={this.props.selected ? 'preview-item selected' : 'preview-item'} onClick={(event) => { this.handleClick(this.props.id, event) }}>{this.props.preview.type === PreviewType.Parent ? this.props.children : this.props.preview.content}</h3>
         );
       case PreviewElement.Div:
       default:
         return (
-          <div style={style} className={this.props.selected ? 'preview-item selected' : 'preview-item'} data-id-id={this.props.id} onClick={this.handleClick}>
+          <div style={style} className={this.props.selected ? 'preview-item selected' : 'preview-item'} data-id-id={this.props.id} onClick={(event) => { this.handleClick(this.props.id, event) }}>
             {this.props.children}
           </div>
         );

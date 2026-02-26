@@ -4,4 +4,5 @@ export interface BoxShadow {
     blur: number;
     spread: number;
     color: string;
+    inset: boolean;
 }

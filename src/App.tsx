@@ -15,11 +15,13 @@ import { Display } from './properties/Display';
 import Switch from 'react-switch';
 import { ExportModal } from './controls/Modals/ExportModal';
 import { Button } from './controls/Button/Button';
+import { DeleteButton } from './controls/Button/DeleteButton';
 import ClipboardJS from 'clipboard';
 import { AlignItems, FlexDirection, JustifyContent } from './properties/Flex';
 import { ExportAllModal } from './controls/Modals/ExportAllModal';
 import { ButtonGroup } from './controls/Button/ButtonGroup';
 import { ShadowControl } from './controls/InputGroups/ShadowControl';
+// import { isPreviewItem } from './utils';
 
 new ClipboardJS(`.btn`);
 
@@ -33,13 +35,14 @@ interface AppState {
   selectedId: number | string;
   highlight: boolean;
   childType: PreviewElement;
+  idCounter: number;
 }
 
 class App extends Component<AppProps, AppState> {
   constructor(props: AppProps) {
     super(props);
     const newPreview = initPreview(0);
-    this.state = {preview: newPreview, previewItems: [{ id: 0, preview: newPreview, selected: true, isParent: true, children: null }], selectedId: 0, highlight: true, childType: PreviewElement.Div };
+    this.state = {preview: newPreview, previewItems: [{ id: 0, preview: newPreview, selected: true, isParent: true, children: null, childIdCounter: 0 }], selectedId: 0, highlight: true, childType: PreviewElement.Div, idCounter: 1};
     this.setChildType = this.setChildType.bind(this);
     this.changeContent = this.changeContent.bind(this);
     this.changeId = this.changeId.bind(this);
@@ -49,6 +52,7 @@ class App extends Component<AppProps, AppState> {
     this.addPreviewItem = this.addPreviewItem.bind(this);
     this.addChild = this.addChild.bind(this);
     this.selectItem = this.selectItem.bind(this);
+    this.deleteItem = this.deleteItem.bind(this);
   }
 
   setChildType(e: ChangeEvent<HTMLInputElement>) {
@@ -114,13 +118,39 @@ class App extends Component<AppProps, AppState> {
     ));
   }
 
+  checkboxChange(value: boolean, property: string, subprop?: string) {
+    this.setState(prevState => (
+      !subprop ? {
+        preview: {
+          ...prevState.preview,
+          [property]: value,
+        },
+        previewItems: prevState.previewItems,
+        selectedId: prevState.selectedId,
+      } : {
+        preview: {
+          ...prevState.preview,
+          [property]: {
+            ...prevState.preview[property],
+            [subprop]: value,
+          },
+        },
+        previewItems: prevState.previewItems,
+        selectedId: prevState.selectedId,
+      }
+    ));
+  }
+
   addPreviewItem() {
+    const id = this.state.idCounter;
+
     const newItem: PreviewItem = {
-      id: this.state.previewItems.length,
-      preview: initPreview(this.state.previewItems.length),
+      id,
+      preview: initPreview(id),
       selected: true,
       children: null,
       isParent: true,
+      childIdCounter: 0,
     };
     this.setState(prevState => ({
       preview: newItem.preview,
@@ -144,17 +174,21 @@ class App extends Component<AppProps, AppState> {
         newItem,
       ],
       selectedId: newItem.id,
+      idCounter: prevState.idCounter + 1,
     }));
   }
 
-  addChild() {
-    const id = `${this.state.selectedId}-${(this.state.preview.children && this.state.preview.children?.length > 0) ? this.state.preview.children?.length : 0}`;
+  addChild(parentId: number | string) {
+    const parent = this.state.previewItems.find(item => item.id === parentId);
+    if (!parent) { return; }
+    const id = `${parentId}-${parent.childIdCounter}`;
     const newItem: PreviewItem = {
       id: id,
       preview: initPreview(id, true, this.state.childType),
       selected: true,
       children: null,
       isParent: false,
+      childIdCounter: 0,
     };
     this.setState(prevState => ({
       preview: newItem.preview,
@@ -173,6 +207,7 @@ class App extends Component<AppProps, AppState> {
           }
         }
         item.selected = false;
+        item.childIdCounter = item.id === parentId ? item.childIdCounter + 1 : item.childIdCounter;
         return item;
       })],
       selectedId: newItem.id,
@@ -203,22 +238,27 @@ class App extends Component<AppProps, AppState> {
   }
 
   selectItem(id: number | string) {
-    const selectedItem = typeof id === 'number' ? this.state.previewItems.find(item => item.id === id) :
-      this.state.previewItems.find(item => item.id.toString() === id.substring(0, id.indexOf('-')))?.children?.find(child => child.id === id);
+    // const selectedItem = typeof id === 'number' ? this.state.previewItems.find(item => item.id === id) :
+    //   this.state.previewItems.find(item => item.id.toString() === id.substring(0, id.indexOf('-')))?.children?.find(child => child.id === id);
+    let selectedItem = this.state.previewItems.find(item => item.id === id);
+    if (!selectedItem) {
+      if (typeof id === 'number') { return; }
+      selectedItem = this.state.previewItems.find(item => item.id.toString() === id.substring(0, id.indexOf('-')))?.children?.find(child => child.id === id);
+    }
     if (selectedItem && selectedItem.id !== this.state.selectedId) {
       selectedItem.selected = true;
       this.setState(prevState => ({
-        preview: selectedItem.preview,
+        preview: selectedItem!.preview,
         previewItems: [...prevState.previewItems.map((item, index) => {
           if (item.id === prevState.preview.id) {
             item.preview = prevState.preview;
           } else {
             if (item.children && typeof item.children !== 'undefined') {
               item.children.forEach(child => {
-                if (child.id === prevState.selectedId && child.id !== selectedItem.id) {
+                if (child.id === prevState.selectedId && child.id !== selectedItem!.id) {
                   child.preview = prevState.preview;
                   child.selected = false;
-                } else if (child.id === selectedItem.id) {
+                } else if (child.id === selectedItem!.id) {
                   child.selected = true;
                 } else {
                   child.selected = false;
@@ -226,16 +266,41 @@ class App extends Component<AppProps, AppState> {
               });
             }
           }
-          if (item.id !== selectedItem.id) {
+          if (item.id !== selectedItem!.id) {
             item.selected = false;
           } else {
             item.selected = true;
           }
           return item;
         })],
-        selectedId: selectedItem.id,
+        selectedId: selectedItem!.id,
       }));
     }
+  }
+
+  deleteItem() {
+    if (this.state.previewItems.length < 2) { return; }
+    const id = this.state.selectedId;
+    let selectedItem = this.state.previewItems.find(item => item.id === id);
+    let nextId = this.state.selectedId === id ? this.state.previewItems.find(item => item.id !== id)!.id : this.state.selectedId;
+    if (!selectedItem) {
+      if (typeof id === 'number') { return; }
+      const parentId = Number(id.substring(0, id.indexOf('-')));
+      selectedItem = this.state.previewItems.find(item => item.id === parentId)?.children?.find(child => child.id === id);
+      nextId = parentId;
+    }
+    this.setState(prevState => ({
+        preview: this.state.previewItems.find(item => item.id === nextId)!.preview,
+        previewItems: [...prevState.previewItems.map((item, index) => {
+          item.children = item.children?.filter(child => child.id !== id);
+          item.selected = false;
+          if (item.id === nextId) {
+            item.selected = true;
+          }
+          return item;
+        }).filter(item => item.id !== id)],
+        selectedId: nextId,
+    }));
   }
 
   render(): React.ReactNode {
@@ -285,6 +350,8 @@ class App extends Component<AppProps, AppState> {
                   offsetX={{ min: -100, max: 100, step: 1, name: 'BoxShadow', property: 'x', title: 'Shadow X', value: this.state.preview.boxShadow.x, onSliderChange: this.sliderChange }}
                   offsetY={{ min: -100, max: 100, step: 1, name: 'BoxShadow', property: 'y', title: 'Shadow Y', value: this.state.preview.boxShadow.y, onSliderChange: this.sliderChange }}
                   blur={{ min: 0, max: 100, step: 1, name: 'BoxShadow', property: 'blur', title: 'Shadow Blur', value: this.state.preview.boxShadow.blur, onSliderChange: this.sliderChange }}
+                  spread={{ min: -100, max: 100, step: 1, name: 'BoxShadow', property: 'spread', title: 'Shadow Spread', value: this.state.preview.boxShadow.spread, onSliderChange: this.sliderChange }}
+                  inset={{ name: 'BoxShadow', property: 'inset', title: 'Inset', value: this.state.preview.boxShadow.inset, onCheckboxChange: this.checkboxChange.bind(this) }}
                   color={this.state.preview.boxShadow.color}
                   colorLabel='Shadow Color:'
                   onColorChange={(color: string) => this.setState({preview: {...this.state.preview, boxShadow: {...this.state.preview.boxShadow, color: color}}, previewItems: this.state.previewItems, selectedId: this.state.selectedId})}
@@ -341,8 +408,9 @@ class App extends Component<AppProps, AppState> {
               </label>
               <div className="row">
                 <Button onClick={this.addPreviewItem} className='btn-sm mr-1'>&#10133; Add</Button>
-                <Button onClick={this.addChild} className='btn-sm btn-group-start' disabled={this.state.preview.id.toString().includes('-')}>&#10133; Child</Button>
+                <Button onClick={() => this.addChild(this.state.selectedId)} className='btn-sm btn-group-start' disabled={this.state.preview.id.toString().includes('-')}>&#10133; Child</Button>
                 <ButtonGroup name='childType' className='btn-sm' wrapperClass='btn-group-end' value={PreviewElement.Div} onChange={this.setChildType} items={[{label: 'Div', value: PreviewElement.Div}, {label: 'P', value: PreviewElement.Paragraph}, {label: 'H2', value: PreviewElement.Heading}, {label: 'H3', value: PreviewElement.Subheading}]} />
+                <DeleteButton disabled={this.state.previewItems.length < 2} onClick={this.deleteItem} />
               </div>
             </div>
             <div className="grid">
