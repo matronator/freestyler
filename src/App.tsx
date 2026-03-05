@@ -21,6 +21,11 @@ import { AlignItems, FlexDirection, JustifyContent } from './properties/Flex';
 import { ExportAllModal } from './controls/Modals/ExportAllModal';
 import { ButtonGroup } from './controls/Button/ButtonGroup';
 import { ShadowControl } from './controls/InputGroups/ShadowControl';
+import { InputCheckbox } from './controls/Input/InputCheckbox';
+import {
+  Box,
+  SyncedBox } from './properties/Box';
+import { SyncControl } from './controls/MarginPadding/SyncControl';
 // import { isPreviewItem } from './utils';
 
 new ClipboardJS(`.btn`);
@@ -42,12 +47,15 @@ class App extends Component<AppProps, AppState> {
   constructor(props: AppProps) {
     super(props);
     const newPreview = initPreview(0);
-    this.state = {preview: newPreview, previewItems: [{ id: 0, preview: newPreview, selected: true, isParent: true, children: null, childIdCounter: 0 }], selectedId: 0, highlight: true, childType: PreviewElement.Div, idCounter: 1};
+    this.state = { preview: newPreview, previewItems: [{ id: 0, preview: newPreview, selected: true, isParent: true, children: null, childIdCounter: 0 }], selectedId: 0, highlight: true, childType: PreviewElement.Div, idCounter: 1 };
     this.setChildType = this.setChildType.bind(this);
     this.changeContent = this.changeContent.bind(this);
     this.changeId = this.changeId.bind(this);
     this.toggleHighlight = this.toggleHighlight.bind(this);
     this.sliderChange = this.sliderChange.bind(this);
+    this.syncedSliderChange = this.syncedSliderChange.bind(this);
+    this.checkboxChange = this.checkboxChange.bind(this);
+    this.syncCheckboxChange = this.syncCheckboxChange.bind(this);
     this.selectChange = this.selectChange.bind(this);
     this.addPreviewItem = this.addPreviewItem.bind(this);
     this.addChild = this.addChild.bind(this);
@@ -118,6 +126,59 @@ class App extends Component<AppProps, AppState> {
     ));
   }
 
+  syncedSliderChange(value: number, property: string, subprop: keyof Box) {
+    const propsToChange = this.getPropsToChange(property, subprop);
+
+    this.setState(prevState => ({
+      ...prevState,
+      preview: {
+        ...prevState.preview,
+        [property]: {
+          ...prevState.preview[property],
+          ...Object.fromEntries(propsToChange.map(prop => [prop, value])),
+        },
+      },
+    }));
+  }
+
+  getPropsToChange(property: string, subprop: keyof Box): Array<keyof Box> {
+    const vertical = (this.state.preview[property] as SyncedBox).syncVertical;
+    const horizontal = (this.state.preview[property] as SyncedBox).syncHorizontal;
+    const all = (this.state.preview[property] as SyncedBox).syncAll;
+
+    if (all) {
+      return ['top', 'right', 'bottom', 'left'];
+    }
+
+    const propsToChange: (keyof Box)[] = [subprop];
+
+    switch (subprop) {
+      case 'bottom':
+        if (vertical) {
+          propsToChange.push('top');
+        }
+        break;
+      case 'right':
+        if (horizontal) {
+          propsToChange.push('left');
+        }
+        break;
+      case 'top':
+        if (vertical) {
+          propsToChange.push('bottom');
+        }
+        break;
+      case 'left':
+        if (horizontal) {
+          propsToChange.push('right');
+        }
+        break;
+      default:
+        break;
+    }
+    return propsToChange;
+  }
+
   checkboxChange(value: boolean, property: string, subprop?: string) {
     this.setState(prevState => (
       !subprop ? {
@@ -139,6 +200,52 @@ class App extends Component<AppProps, AppState> {
         selectedId: prevState.selectedId,
       }
     ));
+  }
+
+  syncCheckboxChange(value: boolean, property: string, subprop: keyof Pick<SyncedBox, 'syncVertical' | 'syncHorizontal' | 'syncAll'>) {
+    if (subprop === 'syncAll' && value === true) {
+      this.setState(prevState => ({
+        ...prevState,
+        preview: {
+          ...prevState.preview,
+          [property]: {
+            ...prevState.preview[property],
+            syncHorizontal: true,
+            syncVertical: true,
+            [subprop]: value,
+          },
+        },
+        previewItems: prevState.previewItems,
+        selectedId: prevState.selectedId,
+      }));
+    } else if (subprop !== 'syncAll' && value === false) {
+      this.setState(prevState => ({
+        ...prevState,
+        preview: {
+          ...prevState.preview,
+          [property]: {
+            ...prevState.preview[property],
+            syncAll: false,
+            [subprop]: value,
+          },
+        },
+        previewItems: prevState.previewItems,
+        selectedId: prevState.selectedId,
+      }));
+    } else {
+      this.setState(prevState => ({
+        ...prevState,
+        preview: {
+          ...prevState.preview,
+          [property]: {
+            ...prevState.preview[property],
+            [subprop]: value,
+          },
+        },
+        previewItems: prevState.previewItems,
+        selectedId: prevState.selectedId,
+      }));
+    }
   }
 
   addPreviewItem() {
@@ -279,7 +386,7 @@ class App extends Component<AppProps, AppState> {
   }
 
   deleteItem() {
-    if (this.state.previewItems.length < 2) { return; }
+    if (!this.canBeDeleted()) { return; }
     const id = this.state.selectedId;
     let selectedItem = this.state.previewItems.find(item => item.id === id);
     let nextId = this.state.selectedId === id ? this.state.previewItems.find(item => item.id !== id)!.id : this.state.selectedId;
@@ -290,17 +397,31 @@ class App extends Component<AppProps, AppState> {
       nextId = parentId;
     }
     this.setState(prevState => ({
-        preview: this.state.previewItems.find(item => item.id === nextId)!.preview,
-        previewItems: [...prevState.previewItems.map((item, index) => {
-          item.children = item.children?.filter(child => child.id !== id);
-          item.selected = false;
-          if (item.id === nextId) {
-            item.selected = true;
-          }
-          return item;
-        }).filter(item => item.id !== id)],
-        selectedId: nextId,
+      preview: this.state.previewItems.find(item => item.id === nextId)!.preview,
+      previewItems: [...prevState.previewItems.map((item, index) => {
+        item.children = item.children?.filter(child => child.id !== id);
+        item.selected = false;
+        if (item.id === nextId) {
+          item.selected = true;
+        }
+        return item;
+      }).filter(item => item.id !== id)],
+      selectedId: nextId,
     }));
+  }
+
+  canBeDeleted() {
+    if (this.state.previewItems.length < 2) {
+      const children = this.state.previewItems[0].children;
+      if (children && typeof children !== 'undefined') {
+        if (children.length > 0) {
+          return typeof this.state.selectedId === 'string' && this.state.selectedId.includes('-');
+        }
+        return false;
+      }
+      return false;
+    }
+    return true;
   }
 
   render(): React.ReactNode {
@@ -309,7 +430,7 @@ class App extends Component<AppProps, AppState> {
         <main>
           <nav className="property-list">
             <ul>
-              <li><div className='col-4 list-label'>Background:</div><div className='col-8 text-right w-100'><PopoverPicker color={this.state.preview.backgroundColor} onChange={(color: string) => this.setState({preview: {...this.state.preview, backgroundColor: color}, previewItems: this.state.previewItems, selectedId: this.state.selectedId})} /></div></li>
+              <li><div className='col-4 list-label'>Background:</div><div className='col-8 text-right w-100'><PopoverPicker color={this.state.preview.backgroundColor} onChange={(color: string) => this.setState({ preview: { ...this.state.preview, backgroundColor: color }, previewItems: this.state.previewItems, selectedId: this.state.selectedId })} /></div></li>
               <li><InputSlider name="Width" title={this.state.preview.type === PreviewType.Child ? 'Width in %' : undefined} min={0} max={640} step={1} relative={this.state.preview.type === PreviewType.Child} onSliderChange={this.sliderChange} value={this.state.preview.width} /></li>
               <li><InputSlider name="Height" title={this.state.preview.type === PreviewType.Child ? 'Height in %' : undefined} min={0} max={480} step={1} relative={this.state.preview.type === PreviewType.Child} onSliderChange={this.sliderChange} value={this.state.preview.height} /></li>
               <li>
@@ -339,7 +460,7 @@ class App extends Component<AppProps, AppState> {
                 <BorderControl
                   color={this.state.preview.border.color}
                   selectValue={this.state.preview.border.style}
-                  onPickerChange={(color: string) => this.setState({preview: {...this.state.preview, border: {...this.state.preview.border, color: color}}})}
+                  onPickerChange={(color: string) => this.setState({ preview: { ...this.state.preview, border: { ...this.state.preview.border, color: color } } })}
                   onSelectChange={this.selectChange}
                   sliderProps={{ min: 0, max: 100, step: 1, value: this.state.preview.border.width, property: 'width', name: 'Border', onSliderChange: this.sliderChange }}
                 />
@@ -354,7 +475,7 @@ class App extends Component<AppProps, AppState> {
                   inset={{ name: 'BoxShadow', property: 'inset', title: 'Inset', value: this.state.preview.boxShadow.inset, onCheckboxChange: this.checkboxChange.bind(this) }}
                   color={this.state.preview.boxShadow.color}
                   colorLabel='Shadow Color:'
-                  onColorChange={(color: string) => this.setState({preview: {...this.state.preview, boxShadow: {...this.state.preview.boxShadow, color: color}}, previewItems: this.state.previewItems, selectedId: this.state.selectedId})}
+                  onColorChange={(color: string) => this.setState({ preview: { ...this.state.preview, boxShadow: { ...this.state.preview.boxShadow, color: color } }, previewItems: this.state.previewItems, selectedId: this.state.selectedId })}
                 />
               </li>
               {[PreviewElement.Heading, PreviewElement.Paragraph, PreviewElement.Subheading].includes(this.state.preview.element) && (
@@ -365,21 +486,23 @@ class App extends Component<AppProps, AppState> {
                     blur={{ min: 0, max: 100, step: 1, name: 'TextShadow', property: 'blur', title: 'Text Shadow Blur', value: this.state.preview.textShadow.blur, onSliderChange: this.sliderChange }}
                     color={this.state.preview.textShadow.color}
                     colorLabel='Text Shadow Color:'
-                    onColorChange={(color: string) => this.setState({preview: {...this.state.preview, textShadow: {...this.state.preview.textShadow, color: color}}, previewItems: this.state.previewItems, selectedId: this.state.selectedId})}
+                    onColorChange={(color: string) => this.setState({ preview: { ...this.state.preview, textShadow: { ...this.state.preview.textShadow, color: color } }, previewItems: this.state.previewItems, selectedId: this.state.selectedId })}
                   />
                 </li>
               )}
               <li>
-                <InputSlider name="Margin" property="top" title="Margin Top" value={this.state.preview.margin.top} min={-100} max={200} step={1} onSliderChange={this.sliderChange} />
-                <InputSlider name="Margin" property="right" title="Margin Right" value={this.state.preview.margin.right} min={-100} max={200} step={1} onSliderChange={this.sliderChange} />
-                <InputSlider name="Margin" property="bottom" title="Margin Bottom" value={this.state.preview.margin.bottom} min={-100} max={200} step={1} onSliderChange={this.sliderChange} />
-                <InputSlider name="Margin" property="left" title="Margin Left" value={this.state.preview.margin.left} min={-100} max={200} step={1} onSliderChange={this.sliderChange} />
+                <SyncControl property="Margin" item={this.state.preview.margin} syncCheckboxChange={this.syncCheckboxChange} />
+                <InputSlider name="Margin" property="top" title="Margin Top" value={this.state.preview.margin.top} min={-100} max={200} step={1} onSliderChange={this.syncedSliderChange} />
+                <InputSlider name="Margin" property="right" title="Margin Right" value={this.state.preview.margin.right} min={-100} max={200} step={1} onSliderChange={this.syncedSliderChange} />
+                <InputSlider name="Margin" property="bottom" title="Margin Bottom" value={this.state.preview.margin.bottom} min={-100} max={200} step={1} onSliderChange={this.syncedSliderChange} />
+                <InputSlider name="Margin" property="left" title="Margin Left" value={this.state.preview.margin.left} min={-100} max={200} step={1} onSliderChange={this.syncedSliderChange} />
               </li>
               <li>
-                <InputSlider name="Padding" property="top" title="Padding Top" value={this.state.preview.padding.top} min={0} max={100} step={1} onSliderChange={this.sliderChange} />
-                <InputSlider name="Padding" property="right" title="Padding Right" value={this.state.preview.padding.right} min={0} max={100} step={1} onSliderChange={this.sliderChange} />
-                <InputSlider name="Padding" property="bottom" title="Padding Bottom" value={this.state.preview.padding.bottom} min={0} max={100} step={1} onSliderChange={this.sliderChange} />
-                <InputSlider name="Padding" property="left" title="Padding Left" value={this.state.preview.padding.left} min={0} max={100} step={1} onSliderChange={this.sliderChange} />
+                <SyncControl property="Padding" item={this.state.preview.padding} syncCheckboxChange={this.syncCheckboxChange} />
+                <InputSlider name="Padding" property="top" title="Padding Top" value={this.state.preview.padding.top} min={0} max={100} step={1} onSliderChange={this.syncedSliderChange} />
+                <InputSlider name="Padding" property="right" title="Padding Right" value={this.state.preview.padding.right} min={0} max={100} step={1} onSliderChange={this.syncedSliderChange} />
+                <InputSlider name="Padding" property="bottom" title="Padding Bottom" value={this.state.preview.padding.bottom} min={0} max={100} step={1} onSliderChange={this.syncedSliderChange} />
+                <InputSlider name="Padding" property="left" title="Padding Left" value={this.state.preview.padding.left} min={0} max={100} step={1} onSliderChange={this.syncedSliderChange} />
               </li>
             </ul>
           </nav>
@@ -409,8 +532,8 @@ class App extends Component<AppProps, AppState> {
               <div className="row">
                 <Button onClick={this.addPreviewItem} className='btn-sm mr-1'>&#10133; Add</Button>
                 <Button onClick={() => this.addChild(this.state.selectedId)} className='btn-sm btn-group-start' disabled={this.state.preview.id.toString().includes('-')}>&#10133; Child</Button>
-                <ButtonGroup name='childType' className='btn-sm' wrapperClass='btn-group-end' value={PreviewElement.Div} onChange={this.setChildType} items={[{label: 'Div', value: PreviewElement.Div}, {label: 'P', value: PreviewElement.Paragraph}, {label: 'H2', value: PreviewElement.Heading}, {label: 'H3', value: PreviewElement.Subheading}]} />
-                <DeleteButton disabled={this.state.previewItems.length < 2} onClick={this.deleteItem} />
+                <ButtonGroup name='childType' className='btn-sm' wrapperClass='btn-group-end' value={PreviewElement.Div} onChange={this.setChildType} items={[{ label: 'Div', value: PreviewElement.Div }, { label: 'P', value: PreviewElement.Paragraph }, { label: 'H2', value: PreviewElement.Heading }, { label: 'H3', value: PreviewElement.Subheading }]} />
+                <DeleteButton disabled={!this.canBeDeleted()} onClick={this.deleteItem} />
               </div>
             </div>
             <div className="grid">

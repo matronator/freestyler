@@ -6,6 +6,8 @@ export interface InputCheckboxProps {
     title?: string;
     property?: string;
     value: boolean;
+    cols?: [number, number];
+    disabled?: boolean;
     onCheckboxChange: Function;
 }
 
@@ -27,9 +29,9 @@ export class InputCheckbox extends PureComponent<InputCheckboxProps, InputCheckb
 
     render() {
         return (
-            <label className='grid col-12'>
-                <div className="col-6 list-label">{this.props.title ?? this.props.name}:</div>
-                <div className="col-6"><input className="input-checkbox" type="checkbox" name={this.props.name.toLowerCase()} id={this.props.name.toLowerCase()} checked={this.state.value} onChange={this.handleChange} /></div>
+            <label className='grid col-12 align-middle mb-2'>
+                <div className={`col-${this.props.cols ? this.props.cols[0] : 6} list-label`}>{this.props.title ?? this.props.name}:</div>
+                <div className={`col-${this.props.cols ? this.props.cols[1] : 6} text-left pl-1`}><input className="input-checkbox align-middle" type="checkbox" disabled={this.props.disabled} name={this.props.name.toLowerCase()} id={this.props.name.toLowerCase()} checked={this.props.value} onChange={this.handleChange} /></div>
             </label>
         );
     }

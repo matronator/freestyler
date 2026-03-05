@@ -1,5 +1,5 @@
-import React, { Component, MouseEvent, ReactNode } from "react";
-import { Box } from "../properties/Box";
+import { Component, MouseEvent, ReactNode } from "react";
+import { SyncedBox } from "../properties/Box";
 import { Display } from "../properties/Display";
 import { AlignItems, FlexDirection, JustifyContent } from "../properties/Flex";
 import { Position } from "../properties/Position";
@@ -39,8 +39,8 @@ export interface Preview {
     border: Border;
     boxShadow: BoxShadow;
     textShadow: TextShadow;
-    margin: Box;
-    padding: Box;
+    margin: SyncedBox;
+    padding: SyncedBox;
 }
 
 export function initPreview(id: number | string, isChild = false, element?: PreviewElement): Preview {
@@ -82,12 +82,18 @@ export function initPreview(id: number | string, isChild = false, element?: Prev
       color: '#000000',
     },
     margin: {
+      syncHorizontal: true,
+      syncVertical: true,
+      syncAll: true,
       top: 0,
       right: 0,
       bottom: 0,
       left: 0,
     },
     padding: {
+      syncHorizontal: true,
+      syncVertical: true,
+      syncAll: true,
       top: 0,
       right: 0,
       bottom: 0,
