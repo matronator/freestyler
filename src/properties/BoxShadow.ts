@@ -6,3 +6,10 @@ export interface BoxShadow {
     color: string;
     inset: boolean;
 }
+
+export interface BoxShadowItem {
+    id: number;
+    order: number;
+    enabled: boolean;
+    style: BoxShadow;
+}

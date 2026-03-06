@@ -79,7 +79,7 @@ export const exportCss = (preview: Preview): string => {
     border: ${preview.border.width}px ${preview.border.style} ${preview.border.color};
     border-radius: ${preview.border.radius}px;
     background-color: ${preview.backgroundColor};
-    box-shadow: ${preview.boxShadow.x}px ${preview.boxShadow.y}px ${preview.boxShadow.blur}px ${preview.boxShadow.spread}px ${preview.boxShadow.color};
+    box-shadow: ${preview.boxShadow.map((item) => `${item.style.inset ? 'inset ' : ''}${item.style.x}px ${item.style.y}px ${item.style.blur}px ${item.style.spread}px ${item.style.color}`).join(', ')};
     margin: ${preview.margin.top}px ${preview.margin.right}px ${preview.margin.bottom}px ${preview.margin.left}px;
     padding: ${preview.padding.top}px ${preview.padding.right}px ${preview.padding.bottom}px ${preview.padding.left}px;
 }`;

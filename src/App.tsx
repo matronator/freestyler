@@ -21,10 +21,7 @@ import { AlignItems, FlexDirection, JustifyContent } from './properties/Flex';
 import { ExportAllModal } from './controls/Modals/ExportAllModal';
 import { ButtonGroup } from './controls/Button/ButtonGroup';
 import { ShadowControl } from './controls/InputGroups/ShadowControl';
-import { InputCheckbox } from './controls/Input/InputCheckbox';
-import {
-  Box,
-  SyncedBox } from './properties/Box';
+import { Box, SyncedBox } from './properties/Box';
 import { SyncControl } from './controls/MarginPadding/SyncControl';
 // import { isPreviewItem } from './utils';
 
@@ -424,7 +421,7 @@ class App extends Component<AppProps, AppState> {
     return true;
   }
 
-  render(): React.ReactNode {
+  render() {
     return (
       <div className={this.state.highlight ? 'App' : 'App no-highlight'}>
         <main>
@@ -467,16 +464,7 @@ class App extends Component<AppProps, AppState> {
               </li>
               <li><InputSlider name="Border" property="radius" title="Border radius" value={this.state.preview.border.radius} min={0} max={200} step={1} onSliderChange={this.sliderChange} /></li>
               <li>
-                <ShadowControl
-                  offsetX={{ min: -100, max: 100, step: 1, name: 'BoxShadow', property: 'x', title: 'Shadow X', value: this.state.preview.boxShadow.x, onSliderChange: this.sliderChange }}
-                  offsetY={{ min: -100, max: 100, step: 1, name: 'BoxShadow', property: 'y', title: 'Shadow Y', value: this.state.preview.boxShadow.y, onSliderChange: this.sliderChange }}
-                  blur={{ min: 0, max: 100, step: 1, name: 'BoxShadow', property: 'blur', title: 'Shadow Blur', value: this.state.preview.boxShadow.blur, onSliderChange: this.sliderChange }}
-                  spread={{ min: -100, max: 100, step: 1, name: 'BoxShadow', property: 'spread', title: 'Shadow Spread', value: this.state.preview.boxShadow.spread, onSliderChange: this.sliderChange }}
-                  inset={{ name: 'BoxShadow', property: 'inset', title: 'Inset', value: this.state.preview.boxShadow.inset, onCheckboxChange: this.checkboxChange.bind(this) }}
-                  color={this.state.preview.boxShadow.color}
-                  colorLabel='Shadow Color:'
-                  onColorChange={(color: string) => this.setState({ preview: { ...this.state.preview, boxShadow: { ...this.state.preview.boxShadow, color: color } }, previewItems: this.state.previewItems, selectedId: this.state.selectedId })}
-                />
+                <Button onClick={this.addPreviewItem} className='btn-sm mr-1'>&#10133; Add</Button>
               </li>
               {[PreviewElement.Heading, PreviewElement.Paragraph, PreviewElement.Subheading].includes(this.state.preview.element) && (
                 <li>
