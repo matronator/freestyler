@@ -11,7 +11,7 @@
 }
 
 main {
-  width: 1024px;
+  width: 1036px;
   min-height: 480px;
   max-height: 680px;
   margin: 0 auto;
@@ -25,9 +25,10 @@ main {
 
 .property-list {
   grid-area: l;
-  width: 320px;
+  width: 332px;
   background-color: #aaaaaa;
   overflow-y: scroll;
+  padding: 6px;
   ul {
     list-style: none;
     padding-inline-start: 0;
@@ -40,9 +41,19 @@ main {
       row-gap: 4px;
       column-gap: 3px;
       align-items: center;
-      border-bottom: .5px solid #222;
+
       > :nth-child(2) {
         text-align: right;
+      }
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: -6px;
+        right: -6px;
+        height: .5px;
+        background-color: #222;
       }
     }
   }
@@ -54,6 +65,41 @@ main {
     font-weight: 500;
     text-transform: uppercase;
   }
+}
+
+.shadow-item {
+  position: relative;
+  background-color: #aaa;
+  padding: .5rem 0;
+  vertical-align: middle;
+  row-gap: 4px;
+  column-gap: 3px;
+  z-index: 1;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -6px;
+    right: -6px;
+    height: .5px;
+    background-color: #222;
+  }
+
+  & .drag-handle {
+    color: #666;
+    scale: 1.5;
+    text-align: center;
+    transform-origin: left center;
+    text-shadow: 1px 1px 1px #bdbdbd;
+  }
+}
+
+.label {
+  font-size: 0.75rem;
+  font-family: 'Dosis', sans-serif;
+  font-weight: 500;
+  text-transform: uppercase;
 }
 
 .tools {

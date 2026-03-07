@@ -67,6 +67,7 @@ export class ExportAllModal extends Component<ExportAllModalProps, ExportAllModa
 
 export const exportCss = (preview: Preview): string => {
     return `#${preview.cssId} {
+    box-sizing: ${preview.boxSizing};
     display: ${preview.display};${[Display.Flex, Display.Grid, Display.InlineFlex, Display.InlineGrid].includes(preview.display) ?
     `
     justify-content: ${preview.justifyContent};
@@ -79,7 +80,7 @@ export const exportCss = (preview: Preview): string => {
     border: ${preview.border.width}px ${preview.border.style} ${preview.border.color};
     border-radius: ${preview.border.radius}px;
     background-color: ${preview.backgroundColor};
-    box-shadow: ${preview.boxShadow.map((item) => `${item.style.inset ? 'inset ' : ''}${item.style.x}px ${item.style.y}px ${item.style.blur}px ${item.style.spread}px ${item.style.color}`).join(', ')};
+    box-shadow: ${preview.boxShadows.map((item) => `${item.style.inset ? 'inset ' : ''}${item.style.x}px ${item.style.y}px ${item.style.blur}px ${item.style.spread}px ${item.style.color}`).join(', ')};
     margin: ${preview.margin.top}px ${preview.margin.right}px ${preview.margin.bottom}px ${preview.margin.left}px;
     padding: ${preview.padding.top}px ${preview.padding.right}px ${preview.padding.bottom}px ${preview.padding.left}px;
 }`;

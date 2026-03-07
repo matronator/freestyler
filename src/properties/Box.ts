@@ -10,3 +10,10 @@ export interface SyncedBox extends Box {
     syncVertical: boolean;
     syncAll: boolean;
 }
+
+export type BoxSizing = 'border-box' | 'content-box';
+
+export const BoxSizing = {
+    BorderBox: 'border-box',
+    ContentBox: 'content-box',
+} as const;

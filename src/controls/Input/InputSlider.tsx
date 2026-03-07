@@ -2,6 +2,7 @@ import './InputSlider.css';
 import { Component } from "react";
 
 export interface InputSliderProps {
+    id?: number;
     name: string;
     title?: string;
     property?: string;
@@ -26,7 +27,7 @@ export class InputSlider extends Component<InputSliderProps, InputSliderState> {
 
     handleChange(e: React.ChangeEvent<HTMLInputElement>) {
         this.setState({value: Number(e.target.value)});
-        this.props.onSliderChange(Number(e.target.value), this.props.name[0].toLowerCase() + this.props.name.substring(1), this.props.property);
+        this.props.onSliderChange(Number(e.target.value), this.props.name[0].toLowerCase() + this.props.name.substring(1), this.props.property, this.props.id);
     }
 
     render() {

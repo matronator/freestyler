@@ -8,6 +8,7 @@ export interface PreviewItem {
     children?: PreviewItem[] | null;
     isParent: boolean;
     childIdCounter: number;
+    shadowIdCounter: number;
 }
 
 interface PreviewListProps {

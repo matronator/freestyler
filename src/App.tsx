@@ -21,9 +21,10 @@ import { AlignItems, FlexDirection, JustifyContent } from './properties/Flex';
 import { ExportAllModal } from './controls/Modals/ExportAllModal';
 import { ButtonGroup } from './controls/Button/ButtonGroup';
 import { ShadowControl } from './controls/InputGroups/ShadowControl';
-import { Box, SyncedBox } from './properties/Box';
+import { Box, BoxSizing, SyncedBox } from './properties/Box';
 import { SyncControl } from './controls/MarginPadding/SyncControl';
-// import { isPreviewItem } from './utils';
+import { BoxShadow, BoxShadowItem } from './properties/BoxShadow';
+import { DragDropContext,Draggable,Droppable,DropResult } from '@hello-pangea/dnd';
 
 new ClipboardJS(`.btn`);
 
@@ -38,26 +39,27 @@ interface AppState {
   highlight: boolean;
   childType: PreviewElement;
   idCounter: number;
+  shadowIdCounter: number;
 }
 
 class App extends Component<AppProps, AppState> {
   constructor(props: AppProps) {
     super(props);
     const newPreview = initPreview(0);
-    this.state = { preview: newPreview, previewItems: [{ id: 0, preview: newPreview, selected: true, isParent: true, children: null, childIdCounter: 0 }], selectedId: 0, highlight: true, childType: PreviewElement.Div, idCounter: 1 };
+    this.state = { preview: newPreview, previewItems: [{ id: 0, preview: newPreview, selected: true, isParent: true, children: null, childIdCounter: 0, shadowIdCounter: 0, }], selectedId: 0, highlight: true, childType: PreviewElement.Div, idCounter: 1, shadowIdCounter: 0, };
     this.setChildType = this.setChildType.bind(this);
     this.changeContent = this.changeContent.bind(this);
     this.changeId = this.changeId.bind(this);
     this.toggleHighlight = this.toggleHighlight.bind(this);
-    this.sliderChange = this.sliderChange.bind(this);
+    this.inputChange = this.inputChange.bind(this);
     this.syncedSliderChange = this.syncedSliderChange.bind(this);
-    this.checkboxChange = this.checkboxChange.bind(this);
     this.syncCheckboxChange = this.syncCheckboxChange.bind(this);
-    this.selectChange = this.selectChange.bind(this);
     this.addPreviewItem = this.addPreviewItem.bind(this);
     this.addChild = this.addChild.bind(this);
     this.selectItem = this.selectItem.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
+    this.addBoxShadow = this.addBoxShadow.bind(this);
+    this.onDragEnd = this.onDragEnd.bind(this);
   }
 
   setChildType(e: ChangeEvent<HTMLInputElement>) {
@@ -100,22 +102,47 @@ class App extends Component<AppProps, AppState> {
     }));
   }
 
-  sliderChange(value: number, property: string, subprop?: string) {
-    this.setState(prevState => (
-      !subprop ? {
+  inputChange(value: any, property: string, subprop?: string, shadowId?: number) {
+    if (property === 'boxShadow') {
+      this.setState(prevState => ({
         preview: {
           ...prevState.preview,
-          [property]: value,
+          boxShadows: [
+            ...prevState.preview.boxShadows.map((shadow: BoxShadowItem, index: number) => {
+              if (shadow.id === shadowId) {
+                return {
+                  ...shadow,
+                  style: {
+                    ...shadow.style,
+                    [subprop as keyof BoxShadow]: value,
+                  }
+                };
+              }
+              return shadow;
+            }),
+          ],
         },
         previewItems: prevState.previewItems,
         selectedId: prevState.selectedId,
-      } : {
+      }));
+      return;
+    }
+
+    this.setState(prevState => (
+      subprop ? {
         preview: {
           ...prevState.preview,
           [property]: {
             ...prevState.preview[property],
             [subprop]: value,
           },
+        },
+        previewItems: prevState.previewItems,
+        selectedId: prevState.selectedId,
+      } : {
+        preview: {
+          ...prevState.preview,
+          [property]: value,
         },
         previewItems: prevState.previewItems,
         selectedId: prevState.selectedId,
@@ -176,29 +203,6 @@ class App extends Component<AppProps, AppState> {
     return propsToChange;
   }
 
-  checkboxChange(value: boolean, property: string, subprop?: string) {
-    this.setState(prevState => (
-      !subprop ? {
-        preview: {
-          ...prevState.preview,
-          [property]: value,
-        },
-        previewItems: prevState.previewItems,
-        selectedId: prevState.selectedId,
-      } : {
-        preview: {
-          ...prevState.preview,
-          [property]: {
-            ...prevState.preview[property],
-            [subprop]: value,
-          },
-        },
-        previewItems: prevState.previewItems,
-        selectedId: prevState.selectedId,
-      }
-    ));
-  }
-
   syncCheckboxChange(value: boolean, property: string, subprop: keyof Pick<SyncedBox, 'syncVertical' | 'syncHorizontal' | 'syncAll'>) {
     if (subprop === 'syncAll' && value === true) {
       this.setState(prevState => ({
@@ -255,6 +259,7 @@ class App extends Component<AppProps, AppState> {
       children: null,
       isParent: true,
       childIdCounter: 0,
+      shadowIdCounter: 0,
     };
     this.setState(prevState => ({
       preview: newItem.preview,
@@ -293,6 +298,7 @@ class App extends Component<AppProps, AppState> {
       children: null,
       isParent: false,
       childIdCounter: 0,
+      shadowIdCounter: 0,
     };
     this.setState(prevState => ({
       preview: newItem.preview,
@@ -316,29 +322,6 @@ class App extends Component<AppProps, AppState> {
       })],
       selectedId: newItem.id,
     }));
-  }
-
-  selectChange(value: any, property: string, subprop?: string) {
-    this.setState(prevState => (
-      !subprop ? {
-        preview: {
-          ...prevState.preview,
-          [property]: value,
-        },
-        previewItems: prevState.previewItems,
-        selectedId: prevState.selectedId,
-      } : {
-        preview: {
-          ...prevState.preview,
-          [property]: {
-            ...prevState.preview[property],
-            [subprop]: value,
-          },
-        },
-        previewItems: prevState.previewItems,
-        selectedId: prevState.selectedId,
-      }
-    ));
   }
 
   selectItem(id: number | string) {
@@ -421,6 +404,66 @@ class App extends Component<AppProps, AppState> {
     return true;
   }
 
+  addBoxShadow() {
+    this.setState(prevState => ({
+      preview: {
+        ...prevState.preview,
+        boxShadows: [...prevState.preview.boxShadows, {
+          id: prevState.shadowIdCounter,
+          order: 0,
+          enabled: true,
+          style: {
+            x: 0,
+            y: 0,
+            blur: 3,
+            spread: 0,
+            color: '#000000',
+            inset: false,
+          },
+        }],
+      },
+      previewItems: prevState.previewItems,
+      selectedId: prevState.selectedId,
+      shadowIdCounter: prevState.shadowIdCounter + 1,
+    }));
+  }
+
+  deleteBoxShadow(id: number) {
+    this.setState(prevState => ({
+      preview: {
+        ...prevState.preview,
+        boxShadows: prevState.preview.boxShadows.filter(shadow => shadow.id !== id),
+      },
+      previewItems: prevState.previewItems,
+      selectedId: prevState.selectedId,
+    }));
+  }
+
+  reorder(list: BoxShadowItem[], startIndex: number, endIndex: number) {
+    const result = Array.from(list);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+
+    return result;
+  }
+
+  onDragEnd(result: DropResult) {
+    if (!result.destination) {
+      return;
+    }
+
+    const items = this.reorder(this.state.preview.boxShadows, result.source.index, result.destination.index);
+
+    this.setState(prevState => ({
+      preview: {
+        ...prevState.preview,
+        boxShadows: items,
+      },
+      previewItems: prevState.previewItems,
+      selectedId: prevState.selectedId,
+    }));
+  }
+
   render() {
     return (
       <div className={this.state.highlight ? 'App' : 'App no-highlight'}>
@@ -428,50 +471,83 @@ class App extends Component<AppProps, AppState> {
           <nav className="property-list">
             <ul>
               <li><div className='col-4 list-label'>Background:</div><div className='col-8 text-right w-100'><PopoverPicker color={this.state.preview.backgroundColor} onChange={(color: string) => this.setState({ preview: { ...this.state.preview, backgroundColor: color }, previewItems: this.state.previewItems, selectedId: this.state.selectedId })} /></div></li>
-              <li><InputSlider name="Width" title={this.state.preview.type === PreviewType.Child ? 'Width in %' : undefined} min={0} max={640} step={1} relative={this.state.preview.type === PreviewType.Child} onSliderChange={this.sliderChange} value={this.state.preview.width} /></li>
-              <li><InputSlider name="Height" title={this.state.preview.type === PreviewType.Child ? 'Height in %' : undefined} min={0} max={480} step={1} relative={this.state.preview.type === PreviewType.Child} onSliderChange={this.sliderChange} value={this.state.preview.height} /></li>
+              <li><InputSlider name="Width" title={this.state.preview.type === PreviewType.Child ? 'Width in %' : undefined} min={0} max={640} step={1} relative={this.state.preview.type === PreviewType.Child} onSliderChange={this.inputChange} value={this.state.preview.width} /></li>
+              <li><InputSlider name="Height" title={this.state.preview.type === PreviewType.Child ? 'Height in %' : undefined} min={0} max={480} step={1} relative={this.state.preview.type === PreviewType.Child} onSliderChange={this.inputChange} value={this.state.preview.height} /></li>
               <li>
-                <div className='col-6 list-label text-center'>Position:</div>
+                <div className='col-6 list-label text-center'>Box Sizing:</div>
                 <div className='col-6 list-label text-center'>Display:</div>
-                <div className='col-6 text-center w-100'><SelectInput id='position' name='position' type='Position' items={Object.values(Position)} value={this.state.preview.position} onSelectChange={this.selectChange} /></div>
-                <div className='col-6 text-center w-100'><SelectInput id='display' name='display' items={Object.values(Display)} value={this.state.preview.display} onSelectChange={this.selectChange} /></div>
+                <div className='col-6 text-center w-100'><SelectInput id='boxSizing' name='boxSizing' type='BoxSizing' items={Object.values(BoxSizing)} value={this.state.preview.boxSizing} onSelectChange={this.inputChange} /></div>
+                <div className='col-6 text-center w-100'><SelectInput id='display' name='display' items={Object.values(Display)} value={this.state.preview.display} onSelectChange={this.inputChange} /></div>
               </li>
               {[Display.Grid, Display.InlineGrid].includes(this.state.preview.display) && (
                 <li>
-                  <InputSlider name="GridColumns" title="Grid columns" value={this.state.preview.gridColumns} min={1} max={12} step={1} onSliderChange={this.sliderChange} />
+                  <InputSlider name="GridColumns" title="Grid columns" value={this.state.preview.gridColumns} min={1} max={12} step={1} onSliderChange={this.inputChange} />
                 </li>
               )}
               {[Display.Flex, Display.Grid, Display.InlineFlex, Display.InlineGrid].includes(this.state.preview.display) && <li>
                 {[Display.Flex, Display.InlineFlex].includes(this.state.preview.display) && (
                   <>
                     <div className='col-12 list-label text-center'>Flex direction:</div>
-                    <div className='col-12 text-center w-100 mb-2'><SelectInput id='flexDirection' name='flexDirection' items={Object.values(FlexDirection)} value={this.state.preview.flexDirection} onSelectChange={this.selectChange} /></div>
+                    <div className='col-12 text-center w-100 mb-2'><SelectInput id='flexDirection' name='flexDirection' items={Object.values(FlexDirection)} value={this.state.preview.flexDirection} onSelectChange={this.inputChange} /></div>
                   </>
                 )}
                 <div className='col-6 list-label text-center'>Justify content:</div>
                 <div className='col-6 list-label text-center'>Align items:</div>
-                <div className='col-6 text-center w-100'><SelectInput id='justifyContent' name='justifyContent' items={Object.values(JustifyContent)} value={this.state.preview.justifyContent} onSelectChange={this.selectChange} /></div>
-                <div className='col-6 text-center w-100'><SelectInput id='alignItems' name='alignItems' items={Object.values(AlignItems)} value={this.state.preview.alignItems} onSelectChange={this.selectChange} /></div>
+                <div className='col-6 text-center w-100'><SelectInput id='justifyContent' name='justifyContent' items={Object.values(JustifyContent)} value={this.state.preview.justifyContent} onSelectChange={this.inputChange} /></div>
+                <div className='col-6 text-center w-100'><SelectInput id='alignItems' name='alignItems' items={Object.values(AlignItems)} value={this.state.preview.alignItems} onSelectChange={this.inputChange} /></div>
               </li>}
               <li>
                 <BorderControl
                   color={this.state.preview.border.color}
                   selectValue={this.state.preview.border.style}
                   onPickerChange={(color: string) => this.setState({ preview: { ...this.state.preview, border: { ...this.state.preview.border, color: color } } })}
-                  onSelectChange={this.selectChange}
-                  sliderProps={{ min: 0, max: 100, step: 1, value: this.state.preview.border.width, property: 'width', name: 'Border', onSliderChange: this.sliderChange }}
+                  onSelectChange={this.inputChange}
+                  sliderProps={{ min: 0, max: 100, step: 1, value: this.state.preview.border.width, property: 'width', name: 'Border', onSliderChange: this.inputChange }}
                 />
               </li>
-              <li><InputSlider name="Border" property="radius" title="Border radius" value={this.state.preview.border.radius} min={0} max={200} step={1} onSliderChange={this.sliderChange} /></li>
+              <li><InputSlider name="Border" property="radius" title="Border radius" value={this.state.preview.border.radius} min={0} max={200} step={1} onSliderChange={this.inputChange} /></li>
               <li>
-                <Button onClick={this.addPreviewItem} className='btn-sm mr-1'>&#10133; Add</Button>
+                <div className="col-12 mb-2">
+                  <Button onClick={this.addBoxShadow} className='btn-sm'>&#10133; Add Box Shadow</Button>
+                </div>
+                <DragDropContext onDragEnd={this.onDragEnd}>
+                  <Droppable droppableId="droppable">
+                    {(provided, snapshot) => (
+                      <div {...provided.droppableProps} ref={provided.innerRef} className="col-12 grid">
+                        {this.state.preview.boxShadows.map((shadow: BoxShadowItem, index: number) => (
+                          <Draggable key={shadow.id} draggableId={shadow.id.toString()} index={index}>
+                            {(provided, snapshot) => (
+                              <div className="col-12 grid shadow-item align-middle" ref={provided.innerRef} {...provided.draggableProps}>
+                                <ShadowControl
+                                  key={index}
+                                  id={shadow.id}
+                                  handle={provided.dragHandleProps}
+                                  deleteItem={() => this.deleteBoxShadow(shadow.id)}
+                                  offsetX={{ min: -100, max: 100, step: 1, name: 'BoxShadow', property: 'x', title: 'Shadow X', value: shadow.style.x, onSliderChange: this.inputChange }}
+                                  offsetY={{ min: -100, max: 100, step: 1, name: 'BoxShadow', property: 'y', title: 'Shadow Y', value: shadow.style.y, onSliderChange: this.inputChange }}
+                                  blur={{ min: 0, max: 100, step: 1, name: 'BoxShadow', property: 'blur', title: 'Shadow Blur', value: shadow.style.blur, onSliderChange: this.inputChange }}
+                                  spread={{ min: -100, max: 100, step: 1, name: 'BoxShadow', property: 'spread', title: 'Shadow Spread', value: shadow.style.spread, onSliderChange: this.inputChange }}
+                                  inset={{ name: 'BoxShadow', property: 'inset', title: 'Inset', value: shadow.style.inset, onCheckboxChange: this.inputChange }}
+                                  color={shadow.style.color}
+                                  colorLabel='Shadow Color:'
+                                  onColorChange={(color: string) => this.setState({ preview: { ...this.state.preview, boxShadows: this.state.preview.boxShadows.map((item: BoxShadowItem, i: number) => i === index ? { ...item, style: { ...item.style, color: color } } : item) }, previewItems: this.state.previewItems, selectedId: this.state.selectedId })}
+                                />
+                              </div>
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
+                </DragDropContext>
               </li>
               {[PreviewElement.Heading, PreviewElement.Paragraph, PreviewElement.Subheading].includes(this.state.preview.element) && (
                 <li>
                   <ShadowControl
-                    offsetX={{ min: -100, max: 100, step: 1, name: 'TextShadow', property: 'x', title: 'Text Shadow X', value: this.state.preview.textShadow.x, onSliderChange: this.sliderChange }}
-                    offsetY={{ min: -100, max: 100, step: 1, name: 'TextShadow', property: 'y', title: 'Text Shadow Y', value: this.state.preview.textShadow.y, onSliderChange: this.sliderChange }}
-                    blur={{ min: 0, max: 100, step: 1, name: 'TextShadow', property: 'blur', title: 'Text Shadow Blur', value: this.state.preview.textShadow.blur, onSliderChange: this.sliderChange }}
+                    offsetX={{ min: -100, max: 100, step: 1, name: 'TextShadow', property: 'x', title: 'Text Shadow X', value: this.state.preview.textShadow.x, onSliderChange: this.inputChange }}
+                    offsetY={{ min: -100, max: 100, step: 1, name: 'TextShadow', property: 'y', title: 'Text Shadow Y', value: this.state.preview.textShadow.y, onSliderChange: this.inputChange }}
+                    blur={{ min: 0, max: 100, step: 1, name: 'TextShadow', property: 'blur', title: 'Text Shadow Blur', value: this.state.preview.textShadow.blur, onSliderChange: this.inputChange }}
                     color={this.state.preview.textShadow.color}
                     colorLabel='Text Shadow Color:'
                     onColorChange={(color: string) => this.setState({ preview: { ...this.state.preview, textShadow: { ...this.state.preview.textShadow, color: color } }, previewItems: this.state.previewItems, selectedId: this.state.selectedId })}

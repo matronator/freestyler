@@ -95,6 +95,32 @@
     }
 }
 
+a.btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    height: 22px;
+    width: 22px;
+    padding: 2px;
+    color: #b91c1c;
+
+    &:hover {
+        color: #a81212;
+    }
+
+    &:active {
+        color: #960d0d;
+    }
+
+
+    & svg {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+}
+
 .btn-group {
     input[type="radio"] {
         position: absolute;

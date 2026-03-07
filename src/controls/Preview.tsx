@@ -1,11 +1,12 @@
 import { Component, MouseEvent, ReactNode } from "react";
-import { SyncedBox } from "../properties/Box";
+import { BoxSizing,
+SyncedBox } from "../properties/Box";
 import { Display } from "../properties/Display";
 import { AlignItems, FlexDirection, JustifyContent } from "../properties/Flex";
 import { Position } from "../properties/Position";
 import { TextShadow } from "../properties/TextShadow";
 import { Border, BorderStyle } from "./../properties/Border";
-import { BoxShadow,BoxShadowItem } from "./../properties/BoxShadow";
+import { BoxShadowItem } from "./../properties/BoxShadow";
 
 export enum PreviewType {
   Parent = 'parent',
@@ -29,6 +30,7 @@ export interface Preview {
     element: PreviewElement;
     position: Position;
     display: Display;
+    boxSizing: BoxSizing;
     flexDirection: FlexDirection;
     justifyContent: JustifyContent;
     alignItems: AlignItems;
@@ -37,7 +39,7 @@ export interface Preview {
     height: number;
     backgroundColor: string;
     border: Border;
-    boxShadow: BoxShadowItem[];
+    boxShadows: BoxShadowItem[];
     textShadow: TextShadow;
     margin: SyncedBox;
     padding: SyncedBox;
@@ -54,6 +56,7 @@ export function initPreview(id: number | string, isChild = false, element?: Prev
     element: element ?? PreviewElement.Div,
     position: Position.Relative,
     display: Display.Flex,
+    boxSizing: BoxSizing.BorderBox,
     flexDirection: FlexDirection.Row,
     justifyContent: JustifyContent.FlexStart,
     alignItems: AlignItems.FlexStart,
@@ -67,21 +70,7 @@ export function initPreview(id: number | string, isChild = false, element?: Prev
       style: BorderStyle.None,
       radius: 0,
     },
-    boxShadow: [
-      {
-        id: 0,
-        order: 0,
-        enabled: true,
-        style: {
-          x: 0,
-          y: 0,
-          blur: 0,
-          spread: 0,
-          color: '#000000',
-          inset: false,
-        },
-      },
-    ],
+    boxShadows: [],
     textShadow: {
       x: 0,
       y: 0,
@@ -134,6 +123,7 @@ export class PreviewDiv extends Component<PreviewDivProps, PreviewDivState> {
   render(): ReactNode {
     const style = {
       display: this.props.preview.display,
+      BoxSizing: this.props.preview.boxSizing,
       flexDirection: this.props.preview.flexDirection,
       justifyContent: this.props.preview.justifyContent,
       alignItems: this.props.preview.alignItems,
@@ -143,7 +133,7 @@ export class PreviewDiv extends Component<PreviewDivProps, PreviewDivState> {
       border: `${this.props.preview.border.width}px ${this.props.preview.border.style} ${this.props.preview.border.color}`,
       borderRadius: `${this.props.preview.border.radius}px`,
       backgroundColor: this.props.preview.backgroundColor,
-      boxShadow: `${this.props.preview.boxShadow.map((item) => `${item.style.inset ? 'inset ' : ''}${item.style.x}px ${item.style.y}px ${item.style.blur}px ${item.style.spread}px ${item.style.color}`).join(', ')}`,
+      boxShadow: `${this.props.preview.boxShadows.map((item) => `${item.style.inset ? 'inset ' : ''}${item.style.x}px ${item.style.y}px ${item.style.blur}px ${item.style.spread}px ${item.style.color}`).join(', ')}`,
       textShadow: `${this.props.preview.textShadow.x}px ${this.props.preview.textShadow.y}px ${this.props.preview.textShadow.blur}px ${this.props.preview.textShadow.color}`,
       margin: `${this.props.preview.margin.top}px ${this.props.preview.margin.right}px ${this.props.preview.margin.bottom}px ${this.props.preview.margin.left}px`,
       padding: `${this.props.preview.padding.top}px ${this.props.preview.padding.right}px ${this.props.preview.padding.bottom}px ${this.props.preview.padding.left}px`,
