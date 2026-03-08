@@ -1,3 +1,5 @@
+![logo](.github/freestyler.jpg)
+
 # Freestyler
 
 Freestyler is a React + TypeScript playground for visually designing CSS layouts and component styles. You can create parent containers, add child elements, tweak style controls in real time, and export generated CSS for a single selected element or the full canvas.
@@ -100,7 +102,3 @@ Freestyler serializes the current preview model into CSS declarations (including
 - `npm test` – run test runner
 - `npm run build` – build production bundle
 - `npm run eject` – eject CRA configuration (irreversible)
-
----
-
-If you want, I can also add a quick **"Usage walkthrough"** section with screenshots and a step-by-step flow for creating/exporting a layout.
